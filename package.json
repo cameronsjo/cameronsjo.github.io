@@ -1,0 +1,32 @@
+{
+  "name": "cameronsjo.github.io",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cameron Sjo's root landing page — Astro, deployed to GitHub Pages (user site)",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^6.4.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/vite": "^4.3.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "vite": "7.3.3"
+  }
+}

@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, GITHUB_URL, PROJECTS } from '../consts';
+
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <h1 class="hero reveal" style="--i: 0">{SITE_DESCRIPTION}</h1>
+
+  <div class="prose reveal max-w-none" style="--i: 1">
+    <p>
+      I'm Cameron Sjo. My day job is threat modeling for LLM-based systems —
+      guardrails, secure-by-design practices, and the policies that keep them
+      honest. The rest of the time I build self-hosted, privacy-first tools I
+      understand well enough to rebuild, and care more about how a system
+      <em>feels</em> than how it benchmarks. The code is on
+      <a href={GITHUB_URL}>GitHub</a>.
+    </p>
+  </div>
+
+  {/* The properties index — same editorial markup as the blog's post list,
+      fed by PROJECTS. Hrefs are absolute root paths to separate deployments. */}
+  <ol class="entries reveal" role="list" style={`--i: ${PROJECTS.length + 1}`}>
+    {
+      PROJECTS.map((project, i) => (
+        <li>
+          <a class="entry" href={project.href}>
+            <span class="entry__rail">
+              <span class="entry__num">{num(i)}</span>
+            </span>
+            <span class="entry__main">
+              <h2 class="entry__title">{project.title}</h2>
+              <span class="entry__desc">{project.blurb}</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</BaseLayout>
