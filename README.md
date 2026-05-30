@@ -15,6 +15,11 @@ npm run preview  # serve the built site
 npm run check    # type-check components
 ```
 
+> **Don't remove the `vite` override in `package.json`.** It pins Vite to
+> `7.3.3`. Without it a fresh install / `npm update` pulls Vite 8, which
+> `@tailwindcss/vite` resolves against Astro 6's bundled Vite 7, and the build
+> dies with `Missing field 'tsconfigPaths'`.
+
 ## What this is
 
 The other GitHub Pages sites are **project sites** served under a sub-path
