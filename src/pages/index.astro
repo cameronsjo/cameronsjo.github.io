@@ -3,39 +3,360 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_TITLE, SITE_DESCRIPTION, GITHUB_URL, PROJECTS } from '../consts';
 
 const num = (i: number) => String(i + 1).padStart(2, '0');
+const slug = (href: string) => href.replace(/^\//, '');
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <h1 class="hero reveal" style="--i: 0">{SITE_DESCRIPTION}</h1>
+  <p class="tagline reveal" style="--i: 0">{SITE_DESCRIPTION}</p>
 
-  <div class="prose reveal max-w-none" style="--i: 1">
-    <p>
-      I'm Cameron Sjo. My day job is threat modeling for LLM-based systems —
-      guardrails, secure-by-design practices, and the policies that keep them
-      honest. The rest of the time I build self-hosted, privacy-first tools I
-      understand well enough to rebuild, and care more about how a system
-      <em>feels</em> than how it benchmarks. The code is on
-      <a href={GITHUB_URL}>GitHub</a>.
-    </p>
-  </div>
+  {/* The launcher — a ⌘K-style command palette as the centerpiece. This is a
+      TOOL surface (you came to jump somewhere), so mono throughout is
+      intentional. Progressive enhancement: without JS it's three working
+      links; the script below layers fuzzy filtering + keyboard nav on top.
+      Fed by PROJECTS; hrefs are absolute root paths to separate deployments. */}
+  <section class="palette reveal" style="--i: 1" aria-label="Jump to a destination">
+    <div class="palette__prompt">
+      <label class="palette__caret" for="launcher-input" aria-hidden="true">›</label>
+      <input
+        id="launcher-input"
+        class="palette__input"
+        type="text"
+        placeholder="jump to…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Filter destinations"
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="launcher-list"
+        aria-autocomplete="list"
+      />
+      <kbd class="palette__kbd" data-launcher-hint>/</kbd>
+    </div>
+    <ul id="launcher-list" class="palette__list" role="listbox" aria-label="Destinations">
+      {
+        PROJECTS.map((p, i) => (
+          <li>
+            <a
+              id={`launch-${i}`}
+              class="row"
+              href={p.href}
+              role="option"
+              aria-selected="false"
+              data-search={`${slug(p.href)} ${p.title} ${p.blurb}`.toLowerCase()}
+            >
+              <span class="row__num">{num(i)}</span>
+              <span class="row__name">{slug(p.href)}</span>
+              <span class="row__desc">{p.blurb}</span>
+              <span class="row__go" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+      <li class="palette__empty" role="status" hidden>
+        No match. Try <b>blog</b>, <b>agentic</b>, or <b>spec</b>.
+      </li>
+    </ul>
+  </section>
 
-  {/* The properties index — same editorial markup as the blog's post list,
-      fed by PROJECTS. Hrefs are absolute root paths to separate deployments. */}
-  <ol class="entries reveal" role="list" style={`--i: ${PROJECTS.length + 1}`}>
-    {
-      PROJECTS.map((project, i) => (
-        <li>
-          <a class="entry" href={project.href}>
-            <span class="entry__rail">
-              <span class="entry__num">{num(i)}</span>
-            </span>
-            <span class="entry__main">
-              <h2 class="entry__title">{project.title}</h2>
-              <span class="entry__desc">{project.blurb}</span>
-            </span>
-          </a>
-        </li>
-      ))
-    }
-  </ol>
+  <p class="bio reveal" style="--i: 2">
+    I'm Cameron Sjo — threat modeling for LLM-based systems by day, building
+    self-hosted, privacy-first tools the rest of the time. Code's on
+    <a href={GITHUB_URL}>GitHub</a>.
+  </p>
 </BaseLayout>
+
+<script>
+  // Fuzzy command palette. Enhancement only — the <a> links work without this.
+  const input = document.getElementById('launcher-input') as HTMLInputElement | null;
+  const list = document.getElementById('launcher-list');
+  if (input && list) {
+    const rows = Array.from(list.querySelectorAll<HTMLAnchorElement>('.row'));
+    const empty = list.querySelector<HTMLElement>('.palette__empty');
+    const hint = document.querySelector<HTMLElement>('[data-launcher-hint]');
+    const items = rows.map((a) => ({
+      a,
+      li: a.closest('li') as HTMLElement,
+      text: a.dataset.search || a.textContent || '',
+    }));
+    let active = 0;
+
+    // Subsequence fuzzy score: -1 if not all query chars appear in order;
+    // higher score rewards consecutive runs and word-boundary starts.
+    function score(query: string, text: string): number {
+      if (!query) return 0;
+      let qi = 0,
+        s = 0,
+        streak = 0,
+        prev = -2;
+      for (let ti = 0; ti < text.length && qi < query.length; ti++) {
+        if (text[ti] === query[qi]) {
+          streak = ti === prev + 1 ? streak + 1 : 1;
+          s += streak * 2;
+          if (ti === 0 || text[ti - 1] === ' ' || text[ti - 1] === '-') s += 5;
+          prev = ti;
+          qi++;
+        }
+      }
+      return qi === query.length ? s : -1;
+    }
+
+    function visible(): HTMLAnchorElement[] {
+      return items.filter((it) => !it.li.hidden).map((it) => it.a);
+    }
+
+    function paintActive(vis: HTMLAnchorElement[]) {
+      rows.forEach((a) => {
+        a.classList.remove('is-active');
+        a.setAttribute('aria-selected', 'false');
+      });
+      const el = vis[active];
+      if (el) {
+        el.classList.add('is-active');
+        el.setAttribute('aria-selected', 'true');
+        input!.setAttribute('aria-activedescendant', el.id);
+        el.scrollIntoView({ block: 'nearest' });
+      } else {
+        input!.removeAttribute('aria-activedescendant');
+      }
+    }
+
+    function render() {
+      const q = input!.value.trim().toLowerCase();
+      const ranked = items
+        .map((it) => ({ it, sc: score(q, it.text) }))
+        .filter((x) => x.sc >= 0)
+        .sort((a, b) => b.sc - a.sc);
+      items.forEach((it) => (it.li.hidden = true));
+      ranked.forEach(({ it }) => {
+        it.li.hidden = false;
+        list!.insertBefore(it.li, empty); // reorder by score, keep empty last
+      });
+      if (empty) empty.hidden = ranked.length > 0;
+      active = ranked.length ? 0 : -1;
+      paintActive(visible());
+    }
+
+    input.addEventListener('input', render);
+
+    input.addEventListener('keydown', (e) => {
+      const vis = visible();
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        active = Math.min(active + 1, vis.length - 1);
+        if (active < 0) active = 0;
+        paintActive(vis);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        active = Math.max(active - 1, 0);
+        paintActive(vis);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (vis[active]) vis[active].click();
+      } else if (e.key === 'Escape') {
+        if (input!.value) {
+          input!.value = '';
+          render();
+        } else {
+          input!.blur();
+        }
+      }
+    });
+
+    // Sync keyboard selection to mouse hover so the two don't fight.
+    rows.forEach((a) => {
+      a.addEventListener('mousemove', () => {
+        const vis = visible();
+        const idx = vis.indexOf(a);
+        if (idx !== -1 && idx !== active) {
+          active = idx;
+          paintActive(vis);
+        }
+      });
+    });
+
+    // ⌘K / Ctrl+K opens (focuses) the palette; "/" focuses when not typing.
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        input!.focus();
+        input!.select();
+      } else if (
+        e.key === '/' &&
+        document.activeElement !== input &&
+        !(document.activeElement instanceof HTMLInputElement)
+      ) {
+        e.preventDefault();
+        input!.focus();
+      }
+    });
+
+    if (hint) hint.textContent = '⌘K';
+    paintActive(visible());
+  }
+</script>
+
+<style>
+  /* Tool surface — mono throughout, justified: this is a launcher, not a
+     document. Tokens only; the palette is built from scratch because this
+     repo (a downstream Artificer consumer) ships no .palette/.card utility. */
+  .tagline {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    line-height: 1.5;
+    color: var(--fg-secondary);
+    max-width: 42ch;
+    margin: 0 0 var(--s-xl);
+    text-wrap: balance;
+  }
+
+  .palette {
+    background: var(--bg-overlay);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+  .palette:focus-within {
+    border-color: var(--accent);
+  }
+
+  .palette__prompt {
+    display: flex;
+    align-items: center;
+    gap: var(--s-sm);
+    padding: var(--s-md) var(--s-lg);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    color: var(--fg-secondary);
+  }
+  .palette__caret {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .palette__input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+  }
+  .palette__input::placeholder {
+    color: var(--fg-secondary);
+    opacity: 0.7;
+  }
+  .palette__kbd {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--steel);
+    white-space: nowrap;
+  }
+
+  .palette__list {
+    list-style: none;
+    margin: 0;
+    padding: var(--s-xs);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, max-content) 1fr auto;
+    align-items: baseline;
+    gap: var(--s-md);
+    padding: var(--s-md);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    color: var(--fg);
+    text-decoration: none;
+    transition: background var(--dur-fast) var(--ease);
+  }
+  .row:hover,
+  .row.is-active {
+    background: var(--bg-raised);
+    text-decoration: none;
+  }
+  .row__num {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--steel);
+  }
+  .row__name {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .row__desc {
+    font-size: 0.8rem;
+    color: var(--fg-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .row__go {
+    color: var(--steel);
+    opacity: 0;
+    transition:
+      opacity var(--dur-fast) var(--ease),
+      transform var(--dur-fast) var(--ease);
+  }
+  .row:hover .row__go,
+  .row:focus-visible .row__go,
+  .row.is-active .row__go {
+    opacity: 1;
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  .palette__empty {
+    padding: var(--s-md);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--fg-secondary);
+  }
+  .palette__empty b {
+    color: var(--fg);
+    font-weight: 700;
+  }
+
+  .bio {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--fg-secondary);
+    max-width: 64ch;
+    margin: var(--s-xl) 0 0;
+  }
+  .bio a {
+    color: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .palette,
+    .row,
+    .row__go {
+      transition: none;
+    }
+    .row__go {
+      opacity: 1;
+    }
+    .row:hover .row__go,
+    .row:focus-visible .row__go,
+    .row.is-active .row__go {
+      transform: none;
+    }
+  }
+
+  /* Phone: drop the inline blurb, keep name + arrow. */
+  @media (max-width: 520px) {
+    .row {
+      grid-template-columns: 2rem 1fr auto;
+    }
+    .row__desc {
+      display: none;
+    }
+  }
+</style>

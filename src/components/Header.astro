@@ -2,13 +2,9 @@
 import { SITE_WORDMARK } from '../consts';
 import { withBase } from '../utils';
 
-// Nav points at the separate project-site deployments. Absolute root paths,
-// hardcoded — NOT routed through withBase() (they leave this site).
-const nav = [
-  { href: '/blog', label: 'Blog' },
-  { href: '/agentic-harnesses', label: 'Harnesses' },
-  { href: '/spec-compare', label: 'Spec Tools' },
-];
+// The three destinations live in the body launcher (a ⌘K-style command
+// palette), so the header carries no nav links — only the brand wordmark and
+// the theme toggle. Duplicating them here would be redundant chrome.
 ---
 
 <header
@@ -22,14 +18,7 @@ const nav = [
   >
     {SITE_WORDMARK}
   </a>
-  <nav class="flex items-center gap-5 text-sm">
-    {
-      nav.map((item) => (
-        <a href={item.href} style="color: var(--fg-secondary)">
-          {item.label}
-        </a>
-      ))
-    }
+  <div class="flex items-center gap-5 text-sm">
     <button
       type="button"
       class="theme-toggle font-mono"
@@ -39,7 +28,7 @@ const nav = [
       <span class="dot" aria-hidden="true"></span>
       <span data-theme-label>Dark</span>
     </button>
-  </nav>
+  </div>
 </header>
 
 <style>
