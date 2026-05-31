@@ -32,4 +32,10 @@ export const PROJECTS: Project[] = [
       'Source-grounded comparison of four agentic coding harnesses (Claude Code, OpenCode, pi, code_puppy) with an interactive loop visualizer.',
     href: '/agentic-harnesses',
   },
+  {
+    title: 'Spec-Driven Development Tools',
+    blurb:
+      'Research-grounded comparison of eleven spec-driven-development tools — workflows stepped in lockstep, a feature matrix, and a use-case scoring heatmap.',
+    href: '/spec-compare',
+  },
 ];
