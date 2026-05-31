@@ -38,4 +38,12 @@ export const PROJECTS: Project[] = [
       'Eleven spec-driven tools compared — feature matrix and use-case heatmap.',
     href: '/spec-compare',
   },
+  {
+    // Unlike the others, this is an IN-SITE route (a page in this deployment),
+    // not a separate Pages site — but the absolute path resolves the same way.
+    title: 'Artificer Design System',
+    blurb:
+      'The dark-first design system these sites are built on — intent, components, and how it grew.',
+    href: '/artificer',
+  },
 ];
