@@ -35,13 +35,10 @@ const slug = (href: string) => href.replace(/^\//, '');
     <ul id="launcher-list" class="palette__list" role="listbox" aria-label="Destinations">
       {
         PROJECTS.map((p, i) => (
-          <li>
+          <li id={`opt-${i}`} role="option" aria-selected="false">
             <a
-              id={`launch-${i}`}
               class="row"
               href={p.href}
-              role="option"
-              aria-selected="false"
               data-search={`${slug(p.href)} ${p.title} ${p.blurb}`.toLowerCase()}
             >
               <span class="row__num">{num(i)}</span>
@@ -105,15 +102,16 @@ const slug = (href: string) => href.replace(/^\//, '');
     }
 
     function paintActive(vis: HTMLAnchorElement[]) {
-      rows.forEach((a) => {
-        a.classList.remove('is-active');
-        a.setAttribute('aria-selected', 'false');
-      });
+      // ARIA selection lives on the <li role="option">; the .is-active class
+      // (visual highlight) lives on the inner <a class="row">.
+      rows.forEach((a) => a.classList.remove('is-active'));
+      items.forEach((it) => it.li.setAttribute('aria-selected', 'false'));
       const el = vis[active];
       if (el) {
+        const li = el.closest('li') as HTMLElement;
         el.classList.add('is-active');
-        el.setAttribute('aria-selected', 'true');
-        input!.setAttribute('aria-activedescendant', el.id);
+        li.setAttribute('aria-selected', 'true');
+        input!.setAttribute('aria-activedescendant', li.id);
         el.scrollIntoView({ block: 'nearest' });
       } else {
         input!.removeAttribute('aria-activedescendant');
@@ -183,7 +181,9 @@ const slug = (href: string) => href.replace(/^\//, '');
       } else if (
         e.key === '/' &&
         document.activeElement !== input &&
-        !(document.activeElement instanceof HTMLInputElement)
+        !(document.activeElement instanceof HTMLInputElement) &&
+        !(document.activeElement instanceof HTMLTextAreaElement) &&
+        !(document.activeElement as HTMLElement | null)?.isContentEditable
       ) {
         e.preventDefault();
         input!.focus();
@@ -191,6 +191,7 @@ const slug = (href: string) => href.replace(/^\//, '');
     });
 
     if (hint) hint.textContent = '⌘K';
+    input.setAttribute('aria-expanded', 'true'); // set by JS so no-JS paths don't claim an open popup
     paintActive(visible());
   }
 </script>
@@ -239,7 +240,6 @@ const slug = (href: string) => href.replace(/^\//, '');
     min-width: 0;
     background: transparent;
     border: none;
-    outline: none;
     color: var(--fg);
     font-family: var(--font-mono);
     font-size: 1rem;
@@ -247,6 +247,13 @@ const slug = (href: string) => href.replace(/^\//, '');
   .palette__input::placeholder {
     color: var(--fg-secondary);
     opacity: 0.7;
+  }
+  /* Restore a real focus indicator on the input itself — the container's
+     :focus-within border shift is a hint, not the focused control's ring. */
+  .palette__input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
   }
   .palette__kbd {
     font-family: var(--font-mono);
