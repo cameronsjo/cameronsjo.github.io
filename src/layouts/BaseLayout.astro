@@ -83,5 +83,15 @@ const { title, description } = Astro.props;
       </main>
       <Footer />
     </div>
+    {/* Cloudflare Web Analytics — cookieless, hostname-scoped to
+        cameronsjo.github.io (one token covers the root, /blog, and
+        /agentic-harnesses). Token is public/write-only; no SRI hash because
+        Cloudflare serves beacon.min.js mutable/unversioned. */}
+    <script
+      is:inline
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "9db7302de886402680e0838d0f35f7db"}'
+    ></script>
   </body>
 </html>
