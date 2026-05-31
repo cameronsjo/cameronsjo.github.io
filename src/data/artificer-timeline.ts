@@ -4,13 +4,17 @@
  * Dates are EVIDENCE-BACKED, not guessed:
  *  - persona prompts: frontmatter `created:` (2025)
  *  - claude.ai/design launch: Apr 17, 2026 (announced)
- *  - v0.1 → v0.6 birth: claude.ai/design → Claude Code *handoff bundles*
- *    (file mtimes of the "Cameron Personal Design System" / "Obsidian Theme" zips)
+ *  - v0.1 birth: the claude.ai/design *session message timestamps* — the design
+ *    session opened Apr 22, 2026 (23:23Z); the entire core spec minted in one
+ *    build run Apr 26 (14:36:54Z); repo scaffolded that same day
+ *  - themes + palette lock (May 5–6): session timestamps (theme build, the
+ *    brick/terracotta destructive A/B, the warm-bone white softening)
+ *  - sister theme + ANSI fix (May 9–11): session timestamps + bundle mtimes
  *  - v0.7 → v0.10.1: canonical repo git log (commit dates)
  *
  * The point of the dates: show how fast — and how burstily — it materialized.
- * A complete, multi-surface, distributed system went from repo-scaffold to
- * v0.10.1 in ~35 days, with same-day version flurries inside that.
+ * A complete, multi-surface, distributed system went from a blank design session
+ * to v0.10.1 in ~40 days, with same-day version flurries inside that.
  *
  * ⚠ OWNER-REVIEW before publish. The "before" and "now" entries carry the
  * personal/archetype voice; the velocity framing is candid but kept
@@ -40,24 +44,31 @@ export const ARTIFICER_TIMELINE: Milestone[] = [
   },
   {
     version: 'v0.1',
-    date: 'Apr 17–26, 2026',
+    date: 'Apr 22–26, 2026',
     phase: 'Scaffolded',
-    title: 'Built through the tool that launched it',
-    body: 'claude.ai/design shipped on Apr 17; within the week the first Artificer sketches were taking shape inside it — not yet good enough to dogfood. By Apr 26 it was solid enough to hand off to Claude Code as a repo. The system was designed in the product, using the product’s own design-to-handoff workflow on itself.',
+    title: 'The whole spec, in one sitting',
+    body: 'The design session opened on Apr 22 — five days after claude.ai/design launched. A round of discovery questions, three aesthetic directions, then the build: on Apr 26 the entire core spec — tokens, components, forms, motion, accessibility, voice — minted in a single run, and became a repo that same day.',
+  },
+  {
+    version: 'v0.x',
+    date: 'May 5, 2026',
+    phase: 'An ecosystem',
+    title: 'One palette, every surface',
+    body: 'Artificer stopped being a web stylesheet and became a multi-surface theme — Claude Code, Ghostty, and VS Code, all generated from one palette, dogfooding the terminal it descends from. Even pure white got backed off to a warm bone so long sessions read as ink-on-paper, not laser-etched chrome.',
   },
   {
     version: 'v0.6.0',
-    date: 'May 9–10, 2026',
+    date: 'May 6, 2026',
     phase: 'The lock',
     title: 'The palette stops moving',
-    body: 'The first full handoff bundle: sage, vermillion, and lilac dropped; apothecary green, brick, deep and lifted purple, and midnight indigo canonicalised. The CHANGELOG first appears between two bundles fifty-six minutes apart.',
+    body: 'After a hard A/B the colours were chosen and frozen: deep purple, gold, champagne; apothecary green for success and brick for destructive — siblings in weight, never one loud and one quiet. The single hardest decision in the system, settled in an evening.',
   },
   {
     version: 'v0.6.1–0.6.4',
-    date: 'May 11–19, 2026',
+    date: 'May 9–11, 2026',
     phase: 'A sister theme',
     title: 'Three releases in twenty-five minutes',
-    body: 'Obsidian split off as a hand-authored sister theme, and the lane model was born to keep the surfaces coherent. One May morning it went 0.6.1 → 0.6.2 → 0.6.3 in twenty-five minutes — the cadence this thing actually moves at.',
+    body: 'An ANSI ordering bug got caught and fixed, Obsidian split off as a hand-authored sister theme, and the lane model was born to keep the surfaces coherent. One May morning Obsidian went 0.6.1 → 0.6.2 → 0.6.3 in twenty-five minutes — the cadence this thing actually moves at.',
   },
   {
     version: 'v0.7',
@@ -68,10 +79,10 @@ export const ARTIFICER_TIMELINE: Milestone[] = [
   },
   {
     version: 'v0.8.0',
-    date: 'May 29, 2026',
+    date: 'May 29–30, 2026',
     phase: 'The exception',
     title: 'Whimsy — the one place the rules relax',
-    body: 'A burnished, flowing rainbow for genuine delight — bounded hard, never on chrome, status, data, or errors, one per view. The mark at the top of this page is the system using its own exception.',
+    body: 'A burnished, flowing rainbow for genuine delight — inspired by the ultrathink shimmer in Claude Code, then bounded hard: never on chrome, status, data, or errors, one per view. Built over one late night, it is the mark at the top of this page — the system using its own exception.',
   },
   {
     version: 'v0.9.0',
@@ -89,9 +100,9 @@ export const ARTIFICER_TIMELINE: Milestone[] = [
   },
   {
     version: 'now',
-    date: '~35 days in',
+    date: '~40 days in',
     phase: 'Used, then tuned',
-    title: 'v0.1 to v0.10.1 in five weeks',
-    body: 'Repo scaffold on Apr 26, ten versions by the end of May, three sites running on it and feeding gaps back upstream. Built fast and on purpose; tuned ever since. The finished object was never the point — the finished feel is.',
+    title: 'A blank session to v0.10.1 in six weeks',
+    body: 'The design session opened Apr 22, the repo followed on Apr 26, and ten versions landed by the end of May — with three sites now running on it and feeding gaps back upstream. Built fast and on purpose; tuned ever since. The finished object was never the point — the finished feel is.',
   },
 ];
