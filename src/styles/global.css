@@ -48,11 +48,14 @@
 }
 
 /* ── Artificer semantic tokens · DARK (default) ──────────────────────────
-   v0.6 palette (apothecary × deco × speakeasy). Hex values are MIRRORED from
-   the canonical source of truth — artificer-design-system/themes/_palette.json
-   (Lane 1) — not imported. Don't substitute without re-checking AAA contrast
-   upstream; this file is a downstream consumer, not the palette owner. */
+   v0.6 palette · v0.9.0 baseline contract (apothecary × deco × speakeasy).
+   Hex values are MIRRORED from the canonical source of truth —
+   artificer-design-system/themes/_palette.json (Lane 1) — not imported. Don't
+   substitute without re-checking AAA contrast upstream; this file is a
+   downstream consumer, not the palette owner. */
 :root {
+  --art-version: "0.9.0"; /* baseline-contract provenance — runtime-queryable */
+
   --bg: #292c33;
   --bg-raised: #313540;
   --bg-overlay: #3c4150;
@@ -73,6 +76,7 @@
 
   /* Needed by the whimsy brand gradient (full Artificer palette). */
   --attention: #c4808a;     /* dusty rose */
+  --urgent: #a04540;        /* terracotta red — baseline status quartet */
   --success: #4a8a5e;       /* apothecary green */
 
   --radius-sm: 4px;
@@ -111,6 +115,7 @@
   --brand-purple: #4a25a0;
 
   --attention: #8a6618;
+  --urgent: #8a2418;        /* terracotta red — darkened for cream */
   --success: #2a5a3a;
 
   color-scheme: light;
