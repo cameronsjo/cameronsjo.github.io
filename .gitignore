@@ -20,3 +20,6 @@ pnpm-debug.log*
 # macOS
 .DS_Store
 .claude/intros/
+
+# Retro triage anchors — local-only, consumed by /cadence:retro meta
+.claude/retro/
