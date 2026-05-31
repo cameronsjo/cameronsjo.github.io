@@ -5,12 +5,17 @@ const year = new Date().getFullYear();
 ---
 
 <footer
-  class="flex flex-col gap-2 border-t py-6 text-sm sm:flex-row sm:items-center sm:justify-between"
+  class="flex flex-col gap-2 border-t py-6 text-sm sm:flex-row sm:items-center"
   style="border-color: var(--border); color: var(--fg-secondary)"
 >
-  <span>© {year} {SITE_TITLE}</span>
-  <span class="whimsy whimsy--glacial" style="font-size: smaller">kindness is free.</span>
-  <span class="flex gap-4">
+  {/* Three equal flex thirds so the middle whimsy line sits at TRUE page
+      center — justify-between centered it only within the gap, which skews
+      right when the © line is wider than the GitHub link. */}
+  <span class="sm:flex-1">© {year} {SITE_TITLE}</span>
+  <span
+    class="whimsy whimsy--glacial sm:flex-1 sm:text-center"
+    style="font-size: smaller">kindness is free.</span>
+  <span class="flex gap-4 sm:flex-1 sm:justify-end">
     <a href={GITHUB_URL}>GitHub</a>
   </span>
 </footer>
