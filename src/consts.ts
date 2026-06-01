@@ -39,6 +39,12 @@ export const PROJECTS: Project[] = [
     href: '/spec-compare',
   },
   {
+    title: 'Understanding Claude Code',
+    blurb:
+      'Claude Code, concept by concept — forks, subagents, and the ideas that catch people.',
+    href: '/understanding-claude-code',
+  },
+  {
     // Unlike the others, this is an IN-SITE route (a page in this deployment),
     // not a separate Pages site — but the absolute path resolves the same way.
     title: 'Artificer Design System',

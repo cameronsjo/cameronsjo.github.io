@@ -41,24 +41,24 @@ site (deploy + Pages) and this repo (register the link). Analytics is automatic.
    Must be `build_type: workflow`, not a legacy branch source, or `deploy-pages` fails.
 5. **Merge to main** → the deploy Action publishes to `https://cameronsjo.github.io/<repo>/`.
 
-### In THIS repo (cameronsjo.github.io) — TWO registration points
+### In THIS repo (cameronsjo.github.io) — ONE registration point
 
 6. `src/consts.ts` → add a `PROJECTS` entry `{ title, blurb, href: '/<repo>' }`.
    The href is an **absolute root path** — do NOT route it through `withBase()`.
-7. `src/components/Header.astro` → add a `nav` entry `{ href: '/<repo>', label: '<short>' }`.
-   **Easy to add the card (6) and forget the nav (7).** Both are needed.
-8. *(optional accuracy)* `src/layouts/BaseLayout.astro` → add `/<repo>` to the
+   (The header carries no nav links — only the brand wordmark — so `consts.ts`
+   is the single registration point.)
+7. *(optional accuracy)* `src/layouts/BaseLayout.astro` → add `/<repo>` to the
    Cloudflare analytics token-coverage comment.
-9. `npm run build` — confirm the link renders in nav + cards. `dist/` is
+8. `npm run build` — confirm the link renders in the property cards. `dist/` is
    gitignored (CI builds it), so only the `src/` files are committed.
 
 ### Analytics — already done, just VERIFY
 
-10. Cloudflare Web Analytics is **hostname-scoped**: one token covers
-    `cameronsjo.github.io/*`. If the new site copied the shell, the beacon is
-    already in its `index.html` — confirm the token matches
-    (`9db7302de886402680e0838d0f35f7db`). Do NOT register anything in the
-    Cloudflare dashboard; sub-paths report automatically.
+9. Cloudflare Web Analytics is **hostname-scoped**: one token covers
+   `cameronsjo.github.io/*`. If the new site copied the shell, the beacon is
+   already in its `index.html` — confirm the token matches
+   (`9db7302de886402680e0838d0f35f7db`). Do NOT register anything in the
+   Cloudflare dashboard; sub-paths report automatically.
 
 ## Merge order
 
@@ -68,5 +68,6 @@ resolves before the landing link goes live — otherwise the new link 404s trans
 ## Common mistakes
 
 - Committing without `package-lock.json` (gitignored) → CI `npm ci` fails.
-- Registering the card but not the nav (or vice-versa).
 - Leaving Pages on a branch source instead of `build_type: workflow`.
+- Pushing to the new repo before enabling Pages is fine — but re-check the deploy
+  Action afterwards; a run that raced the Pages enablement may need a re-run.
