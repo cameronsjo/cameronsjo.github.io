@@ -45,11 +45,11 @@ export const PROJECTS: Project[] = [
     href: '/understanding-claude-code',
   },
   {
-    // Unlike the others, this is an IN-SITE route (a page in this deployment),
-    // not a separate Pages site — but the absolute path resolves the same way.
+    // A separate project Pages site (cameronsjo/artificer) mounted at
+    // /artificer/ — it owns this path and shadows any in-site route here.
     title: 'Artificer Design System',
     blurb:
       'The dark-first design system these sites are built on — intent, components, and how it grew.',
-    href: '/artificer',
+    href: '/artificer/',
   },
 ];
