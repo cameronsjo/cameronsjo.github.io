@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Minute</title>
+        <item>
+            <title>0.27.1</title>
+            <pubDate>Sat, 20 Jun 2026 13:19:50 +0000</pubDate>
+            <sparkle:version>39</sparkle:version>
+            <sparkle:shortVersionString>0.27.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.6</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/cameronsjo/artifacts/releases/download/minute-v0.27.1/Minute-0.27.1.zip" length="29505088" type="application/octet-stream" sparkle:edSignature="kUbkjYLEgMJkw1DDHWiaIFw2C/SXqIMVwNlocejrmicOV1QkvIowBDkQxRm20wIOVk8Hsm7vj6wYN7Jlclj3Cw=="/>
+        </item>
+    </channel>
+</rss>
