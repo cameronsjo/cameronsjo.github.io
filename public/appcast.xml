@@ -4,11 +4,11 @@
         <title>Minute</title>
         <item>
             <title>0.27.1</title>
-            <pubDate>Sat, 20 Jun 2026 13:19:50 +0000</pubDate>
+            <pubDate>Tue, 23 Jun 2026 00:45:06 +0000</pubDate>
             <sparkle:version>39</sparkle:version>
             <sparkle:shortVersionString>0.27.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.6</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/cameronsjo/artifacts/releases/download/minute-v0.27.1/Minute-0.27.1.zip" length="29505088" type="application/octet-stream" sparkle:edSignature="kUbkjYLEgMJkw1DDHWiaIFw2C/SXqIMVwNlocejrmicOV1QkvIowBDkQxRm20wIOVk8Hsm7vj6wYN7Jlclj3Cw=="/>
+            <enclosure url="https://github.com/cameronsjo/artifacts/releases/download/minute-v0.28.0/Minute-0.27.1.zip" length="29611311" type="application/octet-stream" sparkle:edSignature="NcFjL0Z3g/Q2IhUYdYZ4frJv/cv/Dwc5+MI9h0I4/r03AiirwtgJZEtJiW9BKNrzNWLH4Ik+/1su6kDf6CVhCw=="/>
         </item>
     </channel>
 </rss>
