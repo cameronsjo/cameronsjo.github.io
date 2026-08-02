@@ -13,8 +13,10 @@ const year = new Date().getFullYear();
       right when the © line is wider than the GitHub link. */}
   <span class="sm:flex-1">© {year} {SITE_TITLE}</span>
   <span
-    class="whimsy whimsy--glacial sm:flex-1 sm:text-center"
-    style="font-size: smaller">kindness is free.</span>
+    data-whimsy-greeting
+    data-whimsy-greeting-class="whimsy--glacial"
+    class="sm:flex-1 sm:text-center"
+    style="font-size: smaller">kindness is a choice.</span>
   <span class="flex gap-4 sm:flex-1 sm:justify-end">
     <a href={GITHUB_URL}>GitHub</a>
   </span>

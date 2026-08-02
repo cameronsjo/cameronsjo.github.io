@@ -234,6 +234,9 @@ const slug = (href: string) => href.replace(/^\//, '');
   .palette__caret {
     color: var(--accent);
     font-weight: 700;
+    /* Explicit, matching .palette__input beside it — see the .row comment
+       above for why: body's new 14px default would otherwise shrink it. */
+    font-size: 1rem;
   }
   .palette__input {
     flex: 1;
@@ -277,6 +280,11 @@ const slug = (href: string) => href.replace(/^\//, '');
     gap: var(--s-md);
     padding: var(--s-md);
     border-radius: var(--radius-md);
+    /* Explicit rem, not inherited: artificer.css now sets `body { font-size:
+       var(--t-body-md-size) }` (14px, the document/tool-surface default) —
+       without this, .row and .row__name (which had no font-size of their
+       own) would silently shrink from the pre-migration 16px. */
+    font-size: 1rem;
     font-family: var(--font-mono);
     color: var(--fg);
     text-decoration: none;
