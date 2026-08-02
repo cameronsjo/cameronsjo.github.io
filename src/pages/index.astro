@@ -14,12 +14,12 @@ const slug = (href: string) => href.replace(/^\//, '');
       intentional. Progressive enhancement: without JS it's three working
       links; the script below layers fuzzy filtering + keyboard nav on top.
       Fed by PROJECTS; hrefs are absolute root paths to separate deployments. */}
-  <section class="palette reveal" style="--i: 1" aria-label="Jump to a destination">
-    <div class="palette__prompt">
-      <label class="palette__caret" for="launcher-input" aria-hidden="true">›</label>
+  <section class="launcher reveal" style="--i: 1" aria-label="Jump to a destination">
+    <div class="launcher__prompt">
+      <label class="launcher__caret" for="launcher-input" aria-hidden="true">›</label>
       <input
         id="launcher-input"
-        class="palette__input"
+        class="launcher__input"
         type="text"
         placeholder="jump to…"
         autocomplete="off"
@@ -30,9 +30,9 @@ const slug = (href: string) => href.replace(/^\//, '');
         aria-controls="launcher-list"
         aria-autocomplete="list"
       />
-      <kbd class="palette__kbd" data-launcher-hint>/</kbd>
+      <kbd class="launcher__kbd" data-launcher-hint>/</kbd>
     </div>
-    <ul id="launcher-list" class="palette__list" role="listbox" aria-label="Destinations">
+    <ul id="launcher-list" class="launcher__list" role="listbox" aria-label="Destinations">
       {
         PROJECTS.map((p, i) => (
           <li id={`opt-${i}`} role="option" aria-selected="false">
@@ -49,7 +49,7 @@ const slug = (href: string) => href.replace(/^\//, '');
           </li>
         ))
       }
-      <li class="palette__empty" role="status" hidden>
+      <li class="launcher__empty" role="status" hidden>
         No match. Try <b>blog</b>, <b>agentic</b>, or <b>spec</b>.
       </li>
     </ul>
@@ -68,7 +68,7 @@ const slug = (href: string) => href.replace(/^\//, '');
   const list = document.getElementById('launcher-list');
   if (input && list) {
     const rows = Array.from(list.querySelectorAll<HTMLAnchorElement>('.row'));
-    const empty = list.querySelector<HTMLElement>('.palette__empty');
+    const empty = list.querySelector<HTMLElement>('.launcher__empty');
     const hint = document.querySelector<HTMLElement>('[data-launcher-hint]');
     const items = rows.map((a) => ({
       a,
@@ -198,8 +198,11 @@ const slug = (href: string) => href.replace(/^\//, '');
 
 <style>
   /* Tool surface — mono throughout, justified: this is a launcher, not a
-     document. Tokens only; the palette is built from scratch because this
-     repo (a downstream Artificer consumer) ships no .palette/.card utility. */
+     document. Tokens only; the launcher is built from scratch because this
+     repo (a downstream Artificer consumer) ships no .palette/.card utility.
+     Named .launcher, not .palette — artificer.css defines its own unscoped
+     .palette recipe (fixed-position command-palette overlay); Astro's
+     scoped <style> would not shield this element from that global rule. */
   .tagline {
     font-family: var(--font-mono);
     font-weight: 500;
@@ -211,18 +214,18 @@ const slug = (href: string) => href.replace(/^\//, '');
     text-wrap: balance;
   }
 
-  .palette {
+  .launcher {
     background: var(--bg-overlay);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
     transition: border-color var(--dur-fast) var(--ease);
   }
-  .palette:focus-within {
+  .launcher:focus-within {
     border-color: var(--accent);
   }
 
-  .palette__prompt {
+  .launcher__prompt {
     display: flex;
     align-items: center;
     gap: var(--s-sm);
@@ -231,34 +234,30 @@ const slug = (href: string) => href.replace(/^\//, '');
     font-family: var(--font-mono);
     color: var(--fg-secondary);
   }
-  .palette__caret {
+  .launcher__caret {
     color: var(--accent);
     font-weight: 700;
-    /* Explicit, matching .palette__input beside it — see the .row comment
-       above for why: body's new 14px default would otherwise shrink it. */
-    font-size: 1rem;
   }
-  .palette__input {
+  .launcher__input {
     flex: 1;
     min-width: 0;
     background: transparent;
     border: none;
     color: var(--fg);
     font-family: var(--font-mono);
-    font-size: 1rem;
   }
-  .palette__input::placeholder {
+  .launcher__input::placeholder {
     color: var(--fg-secondary);
     opacity: 0.7;
   }
   /* Restore a real focus indicator on the input itself — the container's
      :focus-within border shift is a hint, not the focused control's ring. */
-  .palette__input:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+  .launcher__input:focus-visible {
+    outline: var(--focus-width) solid var(--accent);
+    outline-offset: var(--focus-offset);
     border-radius: var(--radius-sm);
   }
-  .palette__kbd {
+  .launcher__kbd {
     font-family: var(--font-mono);
     font-size: 12px;
     padding: 2px 6px;
@@ -268,7 +267,7 @@ const slug = (href: string) => href.replace(/^\//, '');
     white-space: nowrap;
   }
 
-  .palette__list {
+  .launcher__list {
     list-style: none;
     margin: 0;
     padding: var(--s-xs);
@@ -280,11 +279,6 @@ const slug = (href: string) => href.replace(/^\//, '');
     gap: var(--s-md);
     padding: var(--s-md);
     border-radius: var(--radius-md);
-    /* Explicit rem, not inherited: artificer.css now sets `body { font-size:
-       var(--t-body-md-size) }` (14px, the document/tool-surface default) —
-       without this, .row and .row__name (which had no font-size of their
-       own) would silently shrink from the pre-migration 16px. */
-    font-size: 1rem;
     font-family: var(--font-mono);
     color: var(--fg);
     text-decoration: none;
@@ -326,13 +320,13 @@ const slug = (href: string) => href.replace(/^\//, '');
     transform: translateX(3px);
   }
 
-  .palette__empty {
+  .launcher__empty {
     padding: var(--s-md);
     font-family: var(--font-mono);
     font-size: 0.85rem;
     color: var(--fg-secondary);
   }
-  .palette__empty b {
+  .launcher__empty b {
     color: var(--fg);
     font-weight: 700;
   }
@@ -350,7 +344,7 @@ const slug = (href: string) => href.replace(/^\//, '');
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .palette,
+    .launcher,
     .row,
     .row__go {
       transition: none;
