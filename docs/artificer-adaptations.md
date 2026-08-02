@@ -3,6 +3,107 @@
 How this project bends the Artificer design system, and why. Each entry mirrors a
 feedback issue filed upstream.
 
+## 2026-08-02 — Retired the hand-forks, adopted standard consumption (0.21.0)
+
+**Model migration.** This site carried two hand-forked Artificer copies at two
+different vintages: `src/styles/global.css` stamped `--art-version: "0.9.0"`
+(the palette/token subset below), and `src/styles/whimsy.css` (7 self-hosted
+woff2 in `src/fonts/`) stamped v0.7.2. Neither had received an upstream fix
+since — including the June Pride greeting swap, because the footer's whimsy
+span carried static `whimsy whimsy--glacial` classes with no
+`data-whimsy-greeting` attribute for `Whimsy.greeting()` to hook into. This
+migration retires the *model*, not just the version: pin
+`@cameronsjo/artificer@0.21.0`, consume its CSS + fonts + whimsy.js directly
+via Vite (mirroring `blog`'s 0.18.0 migration — same stack, same shape), and
+shrink `global.css` to only the genuinely site-specific layer stacked on top.
+
+**Stripped from `global.css` (absorbed by the package):**
+
+- The 7 `@font-face` blocks (JetBrains Mono + iA Writer Quattro S) — the
+  package bundles both families and Vite hashes/emits them from
+  `node_modules`; `src/fonts/` and `src/styles/whimsy.css` were deleted.
+- The `--art-version: "0.9.0"` stamp — `global.css` loads last, so leaving it
+  in place would have overridden the package's own `--art-version: "0.21.0"`
+  and silently defeated the fleet's version verification.
+- The full `:root` dark-mode token block (`--bg*`, `--fg*`, `--accent*`,
+  `--steel`, `--brand-purple`, `--attention`/`--urgent`/`--success`,
+  `--radius-*`, `--s-*`, `--dur-fast`, `--ease`, letter/word-spacing,
+  `color-scheme`) and the `:root[data-theme="light"]` paper-mode block — all
+  now sourced from `artificer.css`'s own `:root`, byte-for-byte the same
+  values this repo had been hand-mirroring.
+- The generic `a` / `a:hover` accent rules and `::selection` — now come from
+  `artificer.css`.
+
+**Kept as genuinely site-specific** (mirrors `blog/src/styles/global.css`
+exactly — same editorial layer, same reasoning):
+
+- `@theme { --font-sans; --font-mono }` — Tailwind v4's theme-var exposure;
+  the package's plain `:root` custom properties don't map to Tailwind
+  utilities on their own.
+- `html { font-family; font-size: 16px; line-height; word-spacing }` — pins
+  the rem/clamp() anchor explicitly. (`artificer.css`'s `html { font-size:
+  100% }` resolves to the same 16px, but this repo already pinned 16px
+  literally pre-migration — see the type-scale note below.)
+- `body { margin: 0; min-height: 100vh }`, the `h1–h4` / chrome word-spacing
+  rules, `.wordmark` (color + hover), `code/pre/kbd`, the `:focus-visible`
+  fallback (the package only styles `:focus-visible` on specific components,
+  not a blanket rule), `prefers-reduced-motion`, `.prose` token bindings, the
+  paper-grain texture (`--grain-opacity`, `body::before`), `.topline`,
+  `.shell`, `.reveal`, and the unused `.hero`/`.entries`/`.entry__*`/
+  `.post-title` blocks (dead CSS left over from the blog mirror; out of scope
+  for this migration — the index page is a command-palette launcher styled in
+  `index.astro`'s own scoped `<style>`, not the editorial-list layer).
+
+**Footer defect fixed.** `Footer.astro`'s whimsy span carried static
+`whimsy whimsy--glacial` classes with no `data-whimsy-greeting` attribute —
+`Whimsy.greeting()` only swaps elements matching `[data-whimsy-greeting]`, so
+this site never received a seasonal swap. Converted to the data-attribute
+form (mirroring `blog/src/components/Footer.astro`): inline fallback text +
+`data-whimsy-greeting-class="whimsy--glacial"`, no static whimsy classes
+(`greeting()` adds those itself). Also reworded the sign-off `kindness is
+free.` → `kindness is a choice.` — coincidentally the package's own default
+off-season fallback text (`artificer-whimsy.js`'s `greetingFor()`), confirming
+the wording lines up with upstream doctrine.
+
+**Whimsy load pattern.** `whimsy.js` is a side-effect-only module and the
+package declares `sideEffects: ["*.css", "src/artificer-*.js"]`, so a static
+`import` gets tree-shaken away. `BaseLayout.astro` loads it via a dynamic
+`import()` in a plain `<script>` at the end of `<body>`, same pattern as
+`blog` (which additionally re-applies on `astro:page-load` for View
+Transitions — this site has no `<ClientRouter />`, so a single call on load
+is sufficient).
+
+**Type-scale crossing — what applied and what didn't.** The jump 0.9.0 →
+0.21.0 crosses 0.18.0's "root re-true" (`html { font-size: 100% }` replacing a
+silent 87.5% root). **No-op here**: this site's `html` rule already pinned
+`font-size: 16px` explicitly pre-migration, so the effective root size is
+unchanged. A **real, separate** cascade change did surface: `artificer.css`
+now sets `body { font-size: var(--t-body-md-size) }` (14px, the
+document/tool-surface default), where previously `body` had no font-size of
+its own and inherited 16px from `html`. Two live-content rules relied on that
+implicit inheritance and would have silently shrunk: `.row` (the launcher's
+destination rows — text, name, all cascaded from `.row`'s unset font-size)
+and `.palette__caret` (the `›` prompt symbol). Both now carry an explicit
+`font-size: 1rem`, matching the 16px they rendered at before.
+
+**Verified:** `npm run build` succeeds; `--art-version: "0.21.0"` appears in
+built CSS; the footer span carries `data-whimsy-greeting` and no static
+whimsy classes; no `kindness is free` remains in `src/`; `src/styles/
+whimsy.css` and `src/fonts/` are gone; no `--art-version` or `@font-face`
+remain in `global.css`. `npx @cameronsjo/artificer lint` reports 7 raw-px
+violations (Header.astro's `.theme-toggle`, index.astro's `.row__num`/
+`.palette__kbd`-adjacent 12px sizes, and `global.css`'s pinned `html {
+font-size: 16px }` plus the two unused `.entry__num`/`.entry__date` 12px
+rules) — all pre-existing, none introduced by this migration; not fixed here
+per the migration's scope.
+
+**Could not verify:** no browser is available in this session, so nothing
+was checked visually — no screenshot of the rendered page, light-mode
+paper-mode rendering, the command-palette's fuzzy-filter interaction, or the
+whimsy greeting's actual pixel appearance. The type-scale analysis above is
+from reading CSS source and the cascade rules directly, not from a rendered
+DOM.
+
 ## 2026-05-31 — v0.6/v0.7.2 → v0.9.0 mirror crossing
 
 Upstream issue: [cameronsjo/artificer-design-system#76](https://github.com/cameronsjo/artificer-design-system/issues/76)

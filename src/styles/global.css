@@ -1,45 +1,9 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* ── Self-hosted fonts (Artificer bundle, SIL OFL 1.1) ───────────────────
-   JetBrains Mono → headlines, code, identifiers.
-   iA Writer Quattro S → humanist-sans document body. Quattro is not on
-   Google Fonts, so it must be self-hosted to render as intended. */
-@font-face {
-  font-family: 'JetBrains Mono';
-  src: url('../fonts/jetbrains-mono-400.woff2') format('woff2');
-  font-weight: 400; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'JetBrains Mono';
-  src: url('../fonts/jetbrains-mono-500.woff2') format('woff2');
-  font-weight: 500; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'JetBrains Mono';
-  src: url('../fonts/jetbrains-mono-700.woff2') format('woff2');
-  font-weight: 700; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'iA Writer Quattro S';
-  src: url('../fonts/ia-writer-quattro-s-400.woff2') format('woff2');
-  font-weight: 400; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'iA Writer Quattro S';
-  src: url('../fonts/ia-writer-quattro-s-400-italic.woff2') format('woff2');
-  font-weight: 400; font-style: italic; font-display: swap;
-}
-@font-face {
-  font-family: 'iA Writer Quattro S';
-  src: url('../fonts/ia-writer-quattro-s-700.woff2') format('woff2');
-  font-weight: 700; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'iA Writer Quattro S';
-  src: url('../fonts/ia-writer-quattro-s-700-italic.woff2') format('woff2');
-  font-weight: 700; font-style: italic; font-display: swap;
-}
+/* Fonts (iA Writer Quattro S + JetBrains Mono) are provided by
+   @cameronsjo/artificer's bundled @font-face — Vite resolves and emits the
+   hashed woff2 from node_modules under the site's base path. */
 
 /* Expose the font stacks as Tailwind theme vars (font-sans / font-mono). */
 @theme {
@@ -47,96 +11,33 @@
   --font-mono: "JetBrains Mono", "Berkeley Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
-/* ── Artificer semantic tokens · DARK (default) ──────────────────────────
-   v0.6 palette · v0.9.0 baseline contract (apothecary × deco × speakeasy).
-   Hex values are MIRRORED from the canonical source of truth —
-   artificer-design-system/themes/_palette.json (Lane 1) — not imported. Don't
-   substitute without re-checking AAA contrast upstream; this file is a
-   downstream consumer, not the palette owner. */
-:root {
-  --art-version: "0.9.0"; /* baseline-contract provenance — runtime-queryable */
-
-  --bg: #292c33;
-  --bg-raised: #313540;
-  --bg-overlay: #3c4150;
-  --bg-inactive: #1d1f21;
-
-  --fg: #e8e6e1;
-  --fg-secondary: #c5c8c6;
-  --fg-disabled: #666666;
-  --border: #4a4f5c;
-
-  --accent: #dbbb6f;        /* burnished gold — interactive */
-  --accent-bright: #e3c885; /* hover/focus */
-  --accent-fill: #c4932a;   /* deep gold fill */
-  --on-accent: #20203e;     /* indigo on gold */
-
-  --steel: #b8cad4;         /* meta / paths / chrome */
-  --brand-purple: #5a3a9a;  /* wordmark only — decorative, never semantic */
-
-  /* Needed by the whimsy brand gradient (full Artificer palette). */
-  --attention: #c4808a;     /* dusty rose */
-  --urgent: #a04540;        /* terracotta red — baseline status quartet */
-  --success: #4a8a5e;       /* apothecary green */
-
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-
-  --s-xs: 4px; --s-sm: 8px; --s-md: 16px; --s-lg: 24px; --s-xl: 32px; --s-2xl: 48px;
-
-  --dur-fast: 160ms;
-  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
-
-  --letter-spacing-body: 0.01em;
-  --word-spacing-body: 0.16em;
-
-  color-scheme: dark;
-}
-
-/* ── Paper light mode ────────────────────────────────────────────────── */
-:root[data-theme="light"] {
-  --bg: #f5ead0;            /* ivory paper */
-  --bg-raised: #eddcc0;     /* champagne */
-  --bg-overlay: #e4d4b0;
-  --bg-inactive: #dcc99c;
-
-  --fg: #20203e;            /* midnight indigo ink */
-  --fg-secondary: #4a3f2a;
-  --fg-disabled: #8a8070;
-  --border: #cbb88a;
-
-  --accent: #7a5a10;
-  --accent-bright: #8a6618;
-  --accent-fill: #c4932a;
-  --on-accent: #f5ead0;
-
-  --steel: #2e4a5a;
-  --brand-purple: #4a25a0;
-
-  --attention: #8a6618;
-  --urgent: #8a2418;        /* terracotta red — darkened for cream */
-  --success: #2a5a3a;
-
-  color-scheme: light;
-}
+/* ── Site-specific base ──────────────────────────────────────────────────
+   @cameronsjo/artificer (artificer.css) owns the full semantic palette, the
+   [data-theme] flip, color-scheme, spacing/radius/easing tokens, and the
+   html/body background·color·letter-spacing·body-face. Everything below is
+   the editorial layer this site stacks on top of that. */
 
 html {
-  background-color: var(--bg);
-  color: var(--fg);
+  /* 16px is the rem/clamp() anchor this site's headings are sized against.
+     artificer's `html { font-size: 100% }` resolves to the same value; pin
+     it so the editorial type scale stays explicit. font-family is preflight
+     insurance; word-spacing applies the body var artificer defines but never
+     itself uses. Background/color/letter-spacing/transition come from
+     artificer's `html, body` rule. */
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.65;
-  letter-spacing: var(--letter-spacing-body);
   word-spacing: var(--word-spacing-body);
-  transition:
-    background-color var(--dur-fast) var(--ease),
-    color var(--dur-fast) var(--ease);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  /* artificer.css sets `body { font-size: var(--t-body-md-size) }` (14px,
+     the tool-surface default) — this site is a document surface, so restore
+     the 16px body size for every descendant via the token, not a raw value
+     patched at each leaf that happened to get noticed. */
+  font-size: var(--t-body-lg-size);
 }
 
 /* Headlines: JetBrains Mono — the Artificer signature over the sans body. */
@@ -153,18 +54,11 @@ header, footer, nav {
   word-spacing: normal;
 }
 
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
-a:hover {
-  color: var(--accent-bright);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-/* Wordmark sits at --fg (not the gold link color) until whimsy ignites it.
-   whimsy.css is imported after this file, so .whimsy wins on hover. */
+/* The generic `a` / `a:hover` accent rules now come from artificer.css.
+   The wordmark is an <a> carrying `.whimsy whimsy--brand`, so its glyphs are
+   gradient-filled; suppress artificer's `a:hover` underline so the mark never
+   gains a line under the flowing fill. (Base color is artificer's `.wordmark`;
+   --fg here is harmless belt-and-suspenders should whimsy not paint.) */
 .wordmark {
   color: var(--fg);
 }
@@ -177,8 +71,8 @@ code, pre, kbd {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: var(--focus-width) solid var(--accent);
+  outline-offset: var(--focus-offset);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -241,11 +135,7 @@ code, pre, kbd {
 :root { --grain-opacity: 0.028; }
 :root[data-theme="light"] { --grain-opacity: 0.05; }
 
-/* Selection — gold fill, a small signature detail. */
-::selection {
-  background: var(--accent-fill);
-  color: var(--on-accent);
-}
+/* ::selection (gold fill) now comes from artificer.css. */
 
 /* Paper grain — faint fractal-noise texture for atmosphere. Static; reads as
    paper tooth in light mode, film grain in dark. Sits below content. */
@@ -288,8 +178,11 @@ body::before {
   .reveal { animation: none !important; }
 }
 
-/* ── Index lede — a quiet subtitle under the `blog.` wordmark, not a second
-   headline. Mono, medium weight, secondary ink, comfortable measure. ──── */
+/* ── Index lede — a quiet subtitle under a wordmark, not a second headline.
+   Mono, medium weight, secondary ink, comfortable measure. Unused on this
+   site (the index is a command-palette launcher, styled in index.astro's own
+   scoped <style>) but kept faithfully from the mirrored source; see
+   docs/artificer-adaptations.md. ─────────────────────────────────────────── */
 .hero {
   font-family: var(--font-mono);
   font-weight: 500;
@@ -303,7 +196,8 @@ body::before {
   text-wrap: balance;
 }
 
-/* ── Editorial index entries — asymmetric number/date rail | title/desc ── */
+/* ── Editorial index entries — asymmetric number/date rail | title/desc ──
+   Also unused on this site; see note above. */
 .entries {
   border-bottom: 1px solid var(--border);
   list-style: none;
@@ -371,7 +265,7 @@ body::before {
   color: var(--accent);
 }
 
-/* ── Dramatic post title ───────────────────────────────────────────────── */
+/* ── Dramatic post title (unused here — see .entries note above) ───────── */
 .post-title {
   font-size: clamp(1.85rem, 5.5vw, 2.85rem);
   line-height: 1.12;
