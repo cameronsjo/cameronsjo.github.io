@@ -3,6 +3,39 @@
 How this project bends the Artificer design system, and why. Each entry mirrors a
 feedback issue filed upstream.
 
+## 2026-08-02 — Three-zone colophon spine (0.22.0)
+
+**Fleet consistency pass.** `@cameronsjo/artificer@0.22.0` minted
+`.colophon__spine` — the colophon's one row: identity · sign-off · links,
+three positional grid slots. Bumped `0.21.0` → `0.22.0` and rebuilt
+`Footer.astro` onto it, matching the shape five other sibling sites are
+adopting in the same pass.
+
+- **Before:** hand-rolled Tailwind flex-thirds (`flex flex-col gap-2 border-t
+  py-6 text-sm sm:flex-row sm:items-center`, per-span `sm:flex-1` /
+  `sm:text-center` / `sm:justify-end`, inline `border-color`/`color` on the
+  `<footer>`, inline `font-size: smaller` on the whimsy span) plus a code
+  comment explaining why three equal flex thirds were needed to keep the
+  sign-off centered on the true page width.
+- **After:** `<footer class="colophon"><div class="container"><div
+  class="colophon__spine">…</div></div></footer>`. Zero footer-specific CSS
+  remains in this repo — type treatment, the 44×44 touch floor on spine
+  links, and the mobile stack all come from the package. The three-equal-
+  thirds comment is gone; the primitive's own grid (`1fr auto 1fr`)
+  guarantees the centering it used to explain.
+- **Content unchanged:** `© {year} {SITE_TITLE}` identity, `kindness is a
+  choice.` sign-off (kept from the 0.21.0 migration below, including the
+  data-attribute whimsy-greeting form), single GitHub link — now wrapped in
+  `<nav class="cluster">` instead of a bare `<span class="flex gap-4">`.
+- Zones 1 and 3 (the colophon's optional pre/post-spine content) are unused
+  here — this footer is spine-only, same as before.
+
+**Verified:** `npm run build` and `npx astro check` both exit 0;
+`--art-version: "0.22.0"` appears in built CSS; `dist/index.html`'s footer
+carries `colophon` + `colophon__spine`, `data-whimsy-greeting` with
+`kindness is a choice.` intact. No browser in this session — visual
+rendering unconfirmed.
+
 ## 2026-08-02 — Retired the hand-forks, adopted standard consumption (0.21.0)
 
 **Model migration.** This site carried two hand-forked Artificer copies at two

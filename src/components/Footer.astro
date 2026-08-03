@@ -4,20 +4,14 @@ import { SITE_TITLE, GITHUB_URL } from '../consts';
 const year = new Date().getFullYear();
 ---
 
-<footer
-  class="flex flex-col gap-2 border-t py-6 text-sm sm:flex-row sm:items-center"
-  style="border-color: var(--border); color: var(--fg-secondary)"
->
-  {/* Three equal flex thirds so the middle whimsy line sits at TRUE page
-      center — justify-between centered it only within the gap, which skews
-      right when the © line is wider than the GitHub link. */}
-  <span class="sm:flex-1">© {year} {SITE_TITLE}</span>
-  <span
-    data-whimsy-greeting
-    data-whimsy-greeting-class="whimsy--glacial"
-    class="sm:flex-1 sm:text-center"
-    style="font-size: smaller">kindness is a choice.</span>
-  <span class="flex gap-4 sm:flex-1 sm:justify-end">
-    <a href={GITHUB_URL}>GitHub</a>
-  </span>
+<footer class="colophon">
+  <div class="container">
+    <div class="colophon__spine">
+      <span>© {year} {SITE_TITLE}</span>
+      <span data-whimsy-greeting data-whimsy-greeting-class="whimsy--glacial">kindness is a choice.</span>
+      <nav class="cluster">
+        <a href={GITHUB_URL}>GitHub</a>
+      </nav>
+    </div>
+  </div>
 </footer>

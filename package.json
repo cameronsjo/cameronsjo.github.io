@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@cameronsjo/artificer": "0.21.0",
+    "@cameronsjo/artificer": "0.22.1",
     "astro": "^6.4.2"
   },
   "devDependencies": {
