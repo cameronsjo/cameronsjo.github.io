@@ -1,7 +1,9 @@
 export const SITE_TITLE = 'Cameron Sjo';
 
-// Terminal-prompt wordmark, matching the blog's `blog.` Trivially changeable.
-export const SITE_WORDMARK = 'cameron.';
+// Terminal-prompt wordmark, matching the blog's `blog.` No trailing period —
+// Header.astro renders this inside `.wordmark`, whose `::after` already
+// supplies the burnished accent stop; a literal one here double-stops it.
+export const SITE_WORDMARK = 'cameron';
 
 export const SITE_DESCRIPTION =
   'Principal Software Engineer in AI security. I build things, then tune them until they sing.';
