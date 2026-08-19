@@ -19,60 +19,46 @@ const { title, description } = Astro.props;
   <head>
     <BaseHead title={title} description={description} />
     {/* Theme: applied pre-paint (no FOUC), shared with the rest of the
-        Artificer system via the `artificer.theme` localStorage key. */}
+        Artificer system via the `artificer.theme` localStorage key. This
+        inline bootstrap ONLY sets the initial data-theme attribute before
+        first paint — default dark on a first visit (deliberately overriding
+        prefers-color-scheme), or whatever mode was last pinned. Binding the
+        toggle button (glyph injection, aria-label narration, the
+        dark → light → auto cycle, live OS tracking in auto) is
+        @cameronsjo/artificer/theme.js's job, loaded below.
+
+        A first-time visitor (no stored key) MUST have 'dark' WRITTEN to the
+        key here, not just applied in memory — theme.js's own storedMode()
+        treats a missing key as 'auto', and as a deferred module it binds
+        after this script paints. Without the write, the two disagree: a
+        light-OS visitor paints dark, then flashes to light a few hundred ms
+        later when theme.js reflects its own 'auto' read. Writing the key
+        makes both sides agree on a pinned 'dark' from the same first frame. */}
     <script is:inline>
       (function () {
         var KEY = 'artificer.theme';
-        function current() {
-          return (
-            document.documentElement.getAttribute('data-theme') ||
-            (window.matchMedia('(prefers-color-scheme: light)').matches
-              ? 'light'
-              : 'dark')
-          );
-        }
-        // Always set an explicit data-theme (default dark) so theme-dependent
-        // CSS — including the whimsy layer — never falls into ambiguous
-        // :not([data-theme]) / prefers-color-scheme branches.
-        var initial = 'dark';
+        var stored = null;
         try {
-          var stored = localStorage.getItem(KEY);
-          if (stored === 'light' || stored === 'dark') initial = stored;
+          stored = localStorage.getItem(KEY);
         } catch (e) {}
-        document.documentElement.setAttribute('data-theme', initial);
-
-        function apply(next) {
-          document.documentElement.setAttribute('data-theme', next);
+        var mode = stored === 'light' || stored === 'auto' ? stored : 'dark';
+        if (stored === null) {
           try {
-            localStorage.setItem(KEY, next);
+            localStorage.setItem(KEY, mode);
           } catch (e) {}
-          document.querySelectorAll('[data-theme-label]').forEach(function (l) {
-            l.textContent = next === 'light' ? 'Light' : 'Dark';
-          });
         }
-
-        function bind() {
-          var init = current();
-          document.querySelectorAll('[data-theme-label]').forEach(function (l) {
-            l.textContent = init === 'light' ? 'Light' : 'Dark';
-          });
-          document
-            .querySelectorAll('[data-theme-toggle]')
-            .forEach(function (b) {
-              if (b.dataset.themeBound === '1') return;
-              b.dataset.themeBound = '1';
-              b.addEventListener('click', function () {
-                apply(current() === 'light' ? 'dark' : 'light');
-              });
-            });
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', bind);
-        } else {
-          bind();
-        }
+        var theme =
+          mode === 'auto'
+            ? window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark'
+            : mode;
+        document.documentElement.setAttribute('data-theme', theme);
       })();
+    </script>
+    <script>
+      import '@cameronsjo/artificer/theme.js';
     </script>
   </head>
   <body>
