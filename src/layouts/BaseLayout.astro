@@ -25,7 +25,15 @@ const { title, description } = Astro.props;
         prefers-color-scheme), or whatever mode was last pinned. Binding the
         toggle button (glyph injection, aria-label narration, the
         dark → light → auto cycle, live OS tracking in auto) is
-        @cameronsjo/artificer/theme.js's job, loaded below. */}
+        @cameronsjo/artificer/theme.js's job, loaded below.
+
+        A first-time visitor (no stored key) MUST have 'dark' WRITTEN to the
+        key here, not just applied in memory — theme.js's own storedMode()
+        treats a missing key as 'auto', and as a deferred module it binds
+        after this script paints. Without the write, the two disagree: a
+        light-OS visitor paints dark, then flashes to light a few hundred ms
+        later when theme.js reflects its own 'auto' read. Writing the key
+        makes both sides agree on a pinned 'dark' from the same first frame. */}
     <script is:inline>
       (function () {
         var KEY = 'artificer.theme';
@@ -34,6 +42,11 @@ const { title, description } = Astro.props;
           stored = localStorage.getItem(KEY);
         } catch (e) {}
         var mode = stored === 'light' || stored === 'auto' ? stored : 'dark';
+        if (stored === null) {
+          try {
+            localStorage.setItem(KEY, mode);
+          } catch (e) {}
+        }
         var theme =
           mode === 'auto'
             ? window.matchMedia &&
