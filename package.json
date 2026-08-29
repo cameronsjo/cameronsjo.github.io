@@ -18,7 +18,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "@cameronsjo/artificer": "0.22.1",
-    "astro": "^6.4.2"
+    "astro": "^7.1.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
