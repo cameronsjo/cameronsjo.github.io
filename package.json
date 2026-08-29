@@ -18,16 +18,13 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "@cameronsjo/artificer": "0.22.1",
-    "astro": "^6.4.2"
+    "astro": "^7.2.9"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.3.0",
-    "tailwindcss": "^4.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
-  },
-  "overrides": {
-    "vite": "7.3.3"
   }
 }
