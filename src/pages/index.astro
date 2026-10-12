@@ -221,12 +221,11 @@ const slug = (href: string) => href.replace(/^\//, '');
     text-wrap: balance;
   }
 
-  /* Same reason as .tagline: the launcher is mono throughout. */
+
+  /* word-spacing: same reason as .tagline — the launcher's chrome is mono.
+     .row__desc restores the body spacing for its sans prose. */
   .launcher {
     word-spacing: normal;
-  }
-
-  .launcher {
     background: var(--bg-overlay);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -311,7 +310,7 @@ const slug = (href: string) => href.replace(/^\//, '');
   .row__main {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--s-xs);
     min-width: 0;
   }
   .row__name {
@@ -326,6 +325,7 @@ const slug = (href: string) => href.replace(/^\//, '');
   /* The blurb is prose, so it takes the sans body face. */
   .row__desc {
     font-family: var(--font-sans);
+    word-spacing: var(--word-spacing-body);
     font-size: var(--t-body-md-size);
     line-height: 1.45;
     color: var(--fg-secondary);

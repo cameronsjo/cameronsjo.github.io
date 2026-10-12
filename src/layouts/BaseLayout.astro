@@ -41,7 +41,14 @@ const { title, description } = Astro.props;
         try {
           stored = localStorage.getItem(KEY);
         } catch (e) {}
-        var mode = stored === 'light' || stored === 'auto' ? stored : 'dark';
+        // Missing key: first visit, pin dark. Unrecognised value: 'auto',
+        // the same reading theme.js's storedMode() gives it.
+        var mode =
+          stored === null
+            ? 'dark'
+            : stored === 'dark' || stored === 'light' || stored === 'auto'
+              ? stored
+              : 'auto';
         if (stored === null) {
           try {
             localStorage.setItem(KEY, mode);

@@ -61,6 +61,8 @@ export const PROJECTS: Project[] = [
   {
     // A separate project Pages site (cameronsjo/artificer) mounted at
     // /artificer/ — it owns this path and shadows any in-site route here.
+    // No trailing slash, like every other href: slug() renders the href as
+    // the row name, and Pages redirects /artificer to /artificer/.
     title: 'Artificer Design System',
     blurb:
       'The dark-first design system these sites are built on — intent, components, and how it grew.',
