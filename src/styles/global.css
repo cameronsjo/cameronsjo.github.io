@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 
 /* Fonts (iA Writer Quattro S + JetBrains Mono) are provided by
    @cameronsjo/artificer's bundled @font-face — Vite resolves and emits the
@@ -80,50 +79,6 @@ code, pre, kbd {
     transition-duration: 0ms !important;
     animation-duration: 0ms !important;
   }
-}
-
-/* ── Prose bound to semantic tokens — flips with [data-theme] for free ─── */
-.prose {
-  --tw-prose-body: var(--fg);
-  --tw-prose-headings: var(--fg);
-  --tw-prose-links: var(--accent);
-  --tw-prose-bold: var(--fg);
-  --tw-prose-quotes: var(--fg-secondary);
-  --tw-prose-quote-borders: var(--border);
-  --tw-prose-code: var(--fg);
-  --tw-prose-pre-bg: var(--bg-raised);
-  --tw-prose-pre-code: var(--fg);
-  --tw-prose-hr: var(--border);
-  --tw-prose-bullets: var(--steel);
-  --tw-prose-counters: var(--fg-secondary);
-  --tw-prose-th-borders: var(--border);
-  --tw-prose-td-borders: var(--border);
-}
-.prose :where(h1, h2, h3, h4):not(:where([class~="not-prose"] *)) {
-  font-family: var(--font-mono);
-}
-/* Tailwind Typography wraps inline code in literal backticks — drop them. */
-.prose :where(code):not(:where([class~="not-prose"] *))::before,
-.prose :where(code):not(:where([class~="not-prose"] *))::after {
-  content: none;
-}
-.prose :where(code):not(:where([class~="not-prose"] *)) {
-  background: var(--bg-raised);
-  padding: 0.1em 0.35em;
-  border-radius: var(--radius-sm);
-  font-weight: 400;
-}
-/* Prose links: animated underline that draws in on hover (state, not arrival). */
-.prose :where(a):not(:where([class~="not-prose"] *)) {
-  text-decoration: none;
-  background-image: linear-gradient(var(--accent), var(--accent));
-  background-size: 0% 1px;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  transition: background-size var(--dur-fast) var(--ease);
-}
-.prose :where(a):hover:not(:where([class~="not-prose"] *)) {
-  background-size: 100% 1px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
