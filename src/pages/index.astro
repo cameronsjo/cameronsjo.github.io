@@ -26,7 +26,6 @@ const slug = (href: string) => href.replace(/^\//, '');
         spellcheck="false"
         aria-label="Filter destinations"
         role="combobox"
-        aria-expanded="true"
         aria-controls="launcher-list"
         aria-autocomplete="list"
       />
@@ -51,10 +50,11 @@ const slug = (href: string) => href.replace(/^\//, '');
           </li>
         ))
       }
-      <li class="launcher__empty" role="status" hidden>
-        No destination matches. Try <b>blog</b>, <b>agentic</b>, or <b>today</b>.
-      </li>
     </ul>
+    {/* Outside the listbox: a listbox may only own options. */}
+    <p class="launcher__empty" role="status" hidden>
+      No destination matches. Try <b>blog</b>, <b>agentic</b>, or <b>today</b>.
+    </p>
   </section>
 
   <p class="bio reveal" style="--i: 2">
@@ -70,7 +70,7 @@ const slug = (href: string) => href.replace(/^\//, '');
   const list = document.getElementById('launcher-list');
   if (input && list) {
     const rows = Array.from(list.querySelectorAll<HTMLAnchorElement>('.row'));
-    const empty = list.querySelector<HTMLElement>('.launcher__empty');
+    const empty = document.querySelector<HTMLElement>('.launcher__empty');
     const hint = document.querySelector<HTMLElement>('[data-launcher-hint]');
     const items = rows.map((a) => ({
       a,
@@ -129,7 +129,7 @@ const slug = (href: string) => href.replace(/^\//, '');
       items.forEach((it) => (it.li.hidden = true));
       ranked.forEach(({ it }) => {
         it.li.hidden = false;
-        list!.insertBefore(it.li, empty); // reorder by score, keep empty last
+        list!.appendChild(it.li); // reorder by score
       });
       if (empty) empty.hidden = ranked.length > 0;
       active = ranked.length ? 0 : -1;
@@ -346,7 +346,8 @@ const slug = (href: string) => href.replace(/^\//, '');
   }
 
   .launcher__empty {
-    padding: var(--s-md);
+    margin: 0;
+    padding: var(--s-md) var(--s-lg);
     font-family: var(--font-mono);
     font-size: 0.85rem;
     color: var(--fg-secondary);

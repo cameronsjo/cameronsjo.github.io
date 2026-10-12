@@ -14,7 +14,8 @@ This project uses the **Artificer** design system. Read this file before making 
 > *artificer-design-system repo* and do **not** apply here — this repo owns no
 > tokens, mints no palette values, and ships no themes. The design treatment is
 > **mirrored**: tokens from `_palette.json`, the editorial composition layer
-> (`src/styles/global.css`) copied from the blog, and the whimsy layer
+> (`src/styles/global.css`) copied from the blog, minus the index-entry rules
+> this page doesn't use, and the whimsy layer
 > (`src/styles/whimsy.css`) copied from the canonical `artificer-design-system/
 > src/artificer-whimsy.css`. Any palette / token / role change happens
 > **upstream** in the design-system repo, then re-mirrors down — never edit a
