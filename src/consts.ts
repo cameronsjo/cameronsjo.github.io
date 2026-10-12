@@ -29,6 +29,18 @@ export const PROJECTS: Project[] = [
     href: '/blog',
   },
   {
+    title: 'Agentic 101',
+    blurb:
+      'A free, no-math, interactive course on how AI learns, gets trained, and gets used.',
+    href: '/agentic-101',
+  },
+  {
+    title: 'Today',
+    blurb:
+      'A daily new tab page that Claude writes from your browser history.',
+    href: '/today',
+  },
+  {
     title: 'Agentic Harnesses',
     blurb:
       'Four agentic coding harnesses compared, with an interactive loop visualizer.',
@@ -49,9 +61,11 @@ export const PROJECTS: Project[] = [
   {
     // A separate project Pages site (cameronsjo/artificer) mounted at
     // /artificer/ — it owns this path and shadows any in-site route here.
+    // No trailing slash, like every other href: slug() renders the href as
+    // the row name, and Pages redirects /artificer to /artificer/.
     title: 'Artificer Design System',
     blurb:
       'The dark-first design system these sites are built on — intent, components, and how it grew.',
-    href: '/artificer/',
+    href: '/artificer',
   },
 ];

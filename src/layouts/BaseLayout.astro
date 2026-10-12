@@ -41,7 +41,14 @@ const { title, description } = Astro.props;
         try {
           stored = localStorage.getItem(KEY);
         } catch (e) {}
-        var mode = stored === 'light' || stored === 'auto' ? stored : 'dark';
+        // Missing key: first visit, pin dark. Unrecognised value: 'auto',
+        // the same reading theme.js's storedMode() gives it.
+        var mode =
+          stored === null
+            ? 'dark'
+            : stored === 'dark' || stored === 'light' || stored === 'auto'
+              ? stored
+              : 'auto';
         if (stored === null) {
           try {
             localStorage.setItem(KEY, mode);
@@ -71,8 +78,8 @@ const { title, description } = Astro.props;
       <Footer />
     </div>
     {/* Cloudflare Web Analytics — cookieless, hostname-scoped to
-        cameronsjo.github.io (one token covers the root, /blog,
-        /agentic-harnesses, /spec-compare, and /understanding-claude-code).
+        cameronsjo.github.io (one token covers the root and every /<repo>
+        property linked from PROJECTS in src/consts.ts).
         Token is public/write-only; no SRI hash because Cloudflare serves
         beacon.min.js mutable/unversioned. */}
     <script

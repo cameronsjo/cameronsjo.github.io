@@ -7,12 +7,12 @@ const slug = (href: string) => href.replace(/^\//, '');
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <p class="tagline reveal" style="--i: 0">{SITE_DESCRIPTION}</p>
+  <h1 class="tagline reveal" style="--i: 0">{SITE_DESCRIPTION}</h1>
 
   {/* The launcher — a ⌘K-style command palette as the centerpiece. This is a
       TOOL surface (you came to jump somewhere), so mono throughout is
-      intentional. Progressive enhancement: without JS it's three working
-      links; the script below layers fuzzy filtering + keyboard nav on top.
+      intentional. Progressive enhancement: without JS it is a plain list of
+      working links; the script below layers fuzzy filtering + keyboard nav on top.
       Fed by PROJECTS; hrefs are absolute root paths to separate deployments. */}
   <section class="launcher reveal" style="--i: 1" aria-label="Jump to a destination">
     <div class="launcher__prompt">
@@ -26,7 +26,6 @@ const slug = (href: string) => href.replace(/^\//, '');
         spellcheck="false"
         aria-label="Filter destinations"
         role="combobox"
-        aria-expanded="true"
         aria-controls="launcher-list"
         aria-autocomplete="list"
       />
@@ -42,23 +41,26 @@ const slug = (href: string) => href.replace(/^\//, '');
               data-search={`${slug(p.href)} ${p.title} ${p.blurb}`.toLowerCase()}
             >
               <span class="row__num">{num(i)}</span>
-              <span class="row__name">{slug(p.href)}</span>
-              <span class="row__desc">{p.blurb}</span>
+              <span class="row__main">
+                <span class="row__name">{slug(p.href)}</span>
+                <span class="row__desc">{p.blurb}</span>
+              </span>
               <span class="row__go" aria-hidden="true">→</span>
             </a>
           </li>
         ))
       }
-      <li class="launcher__empty" role="status" hidden>
-        No match. Try <b>blog</b>, <b>agentic</b>, or <b>spec</b>.
-      </li>
     </ul>
+    {/* Outside the listbox: a listbox may only own options. */}
+    <p class="launcher__empty" role="status" hidden>
+      No destination matches. Try <b>blog</b>, <b>agentic</b>, or <b>today</b>.
+    </p>
   </section>
 
   <p class="bio reveal" style="--i: 2">
     I'm Cameron Sjo — threat modeling for LLM-based systems by day, building
-    self-hosted, privacy-first tools the rest of the time. Code's on
-    <a href={GITHUB_URL}>GitHub</a>.
+    self-hosted, privacy-first tools the rest of the time. The code is on <a
+      href={GITHUB_URL}>GitHub</a>.
   </p>
 </BaseLayout>
 
@@ -68,7 +70,7 @@ const slug = (href: string) => href.replace(/^\//, '');
   const list = document.getElementById('launcher-list');
   if (input && list) {
     const rows = Array.from(list.querySelectorAll<HTMLAnchorElement>('.row'));
-    const empty = list.querySelector<HTMLElement>('.launcher__empty');
+    const empty = document.querySelector<HTMLElement>('.launcher__empty');
     const hint = document.querySelector<HTMLElement>('[data-launcher-hint]');
     const items = rows.map((a) => ({
       a,
@@ -127,7 +129,7 @@ const slug = (href: string) => href.replace(/^\//, '');
       items.forEach((it) => (it.li.hidden = true));
       ranked.forEach(({ it }) => {
         it.li.hidden = false;
-        list!.insertBefore(it.li, empty); // reorder by score, keep empty last
+        list!.appendChild(it.li); // reorder by score
       });
       if (empty) empty.hidden = ranked.length > 0;
       active = ranked.length ? 0 : -1;
@@ -203,18 +205,27 @@ const slug = (href: string) => href.replace(/^\//, '');
      Named .launcher, not .palette — artificer.css defines its own unscoped
      .palette recipe (fixed-position command-palette overlay); Astro's
      scoped <style> would not shield this element from that global rule. */
+  /* The page's one <h1>. Mono display type, so it drops the sans body's
+     word-spacing: JetBrains Mono already gives each space a full cell, and
+     the extra 0.16em reads as double spaces. */
   .tagline {
     font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: clamp(1rem, 2vw, 1.15rem);
-    line-height: 1.5;
-    color: var(--fg-secondary);
-    max-width: 42ch;
-    margin: 0 0 var(--s-xl);
+    font-weight: 700;
+    font-size: clamp(1.35rem, 3.6vw, 1.85rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    word-spacing: normal;
+    color: var(--fg);
+    max-width: 30ch;
+    margin: var(--s-lg) 0 var(--s-2xl);
     text-wrap: balance;
   }
 
+
+  /* word-spacing: same reason as .tagline — the launcher's chrome is mono.
+     .row__desc restores the body spacing for its sans prose. */
   .launcher {
+    word-spacing: normal;
     background: var(--bg-overlay);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -272,12 +283,14 @@ const slug = (href: string) => href.replace(/^\//, '');
     margin: 0;
     padding: var(--s-xs);
   }
+  /* Two-line rows: name over blurb. The single-line layout truncated every
+     blurb to a few words at desktop width and dropped it entirely on phones. */
   .row {
     display: grid;
-    grid-template-columns: 2.5rem minmax(0, max-content) 1fr auto;
+    grid-template-columns: 2.5rem 1fr auto;
     align-items: baseline;
     gap: var(--s-md);
-    padding: var(--s-md);
+    padding: var(--s-sm) var(--s-md);
     border-radius: var(--radius-md);
     font-family: var(--font-mono);
     color: var(--fg);
@@ -294,16 +307,28 @@ const slug = (href: string) => href.replace(/^\//, '');
     font-variant-numeric: tabular-nums;
     color: var(--steel);
   }
+  .row__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-xs);
+    min-width: 0;
+  }
   .row__name {
     font-weight: 700;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    transition: color var(--dur-fast) var(--ease);
   }
+  .row:hover .row__name,
+  .row.is-active .row__name {
+    color: var(--accent);
+  }
+  /* The blurb is prose, so it takes the sans body face. */
   .row__desc {
-    font-size: 0.8rem;
+    font-family: var(--font-sans);
+    word-spacing: var(--word-spacing-body);
+    font-size: var(--t-body-md-size);
+    line-height: 1.45;
     color: var(--fg-secondary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   .row__go {
     color: var(--steel);
@@ -321,7 +346,8 @@ const slug = (href: string) => href.replace(/^\//, '');
   }
 
   .launcher__empty {
-    padding: var(--s-md);
+    margin: 0;
+    padding: var(--s-md) var(--s-lg);
     font-family: var(--font-mono);
     font-size: 0.85rem;
     color: var(--fg-secondary);
@@ -331,10 +357,10 @@ const slug = (href: string) => href.replace(/^\//, '');
     font-weight: 700;
   }
 
+  /* Prose — sans body face, per the document-surface default. */
   .bio {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    line-height: 1.55;
+    font-size: var(--t-body-lg-size);
+    line-height: 1.6;
     color: var(--fg-secondary);
     max-width: 64ch;
     margin: var(--s-xl) 0 0;
@@ -359,13 +385,10 @@ const slug = (href: string) => href.replace(/^\//, '');
     }
   }
 
-  /* Phone: drop the inline blurb, keep name + arrow. */
   @media (max-width: 520px) {
     .row {
       grid-template-columns: 2rem 1fr auto;
-    }
-    .row__desc {
-      display: none;
+      gap: var(--s-sm);
     }
   }
 </style>
