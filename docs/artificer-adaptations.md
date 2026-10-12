@@ -28,8 +28,10 @@ used it, so nothing breaks. The bump is a version change only.
   `src/styles/global.css`. The class names differ (`.entry__desc` vs
   `.entry__excerpt`, `.entry__rail` vs `.entry__meta`), so adopting it means
   changing markup. This site used none of `.hero`, `.entries`/`.entry`, or
-  `.post-title`, so that block is deleted. What stays copied (`.reveal`,
-  `.prose`) follows the blog's adoption (cameronsjo/blog#16).
+  `.post-title`, so that block is deleted. `.prose` is gone too, along with
+  `@tailwindcss/typography` (#24): nothing here used it, and the plugin pinned a
+  vulnerable `postcss-selector-parser`. What stays copied (`.reveal`) follows
+  the blog's adoption (cameronsjo/blog#16).
 - `texture.css` `.tex-grain` covers the hand-rolled `body::before` grain.
 - `.eyebrow` (0.27.0) covers small uppercase labels. None exist here today.
 
