@@ -3,6 +3,35 @@
 How this project bends the Artificer design system, and why. Each entry mirrors a
 feedback issue filed upstream.
 
+## 2026-10-12 — 0.22.1 → 0.27.0, launcher polish
+
+**Ledger walk.** `primitives.json` at 0.27.0 records one breaking event in the
+range: 0.24.0 removes the copy-consumed React `useTheme` hook. This site never
+used it, so nothing breaks. The bump is a version change only.
+
+**Local fixes in the same pass.**
+
+- Mono text (tagline, launcher, bio) inherited the sans body's
+  `word-spacing: var(--word-spacing-body)` (0.16em), so every space read as a
+  double space. The tagline and launcher now set `word-spacing: normal`.
+- The tagline is now the page's `<h1>`. The page had no `<h1>` before.
+- Launcher rows are two lines (name over blurb). The one-line grid truncated
+  every blurb at desktop width and hid it on phones.
+- Blurbs and the bio are prose, so they use the sans face.
+- The footer dropped its `.container` wrapper. Inside the `max-w-2xl px-5`
+  shell, `.container`'s inline padding indented the footer a second time.
+
+**Adoption map (advisory, not applied).**
+
+- `editorial.css` (`.entries`, `.entry`, `.masthead`, `.editorial-hero`,
+  `.reveal`, `.prose`) is the packaged form of the hand-copied layer in
+  `src/styles/global.css`. The class names differ (`.entry__desc` vs
+  `.entry__excerpt`, `.entry__rail` vs `.entry__meta`), so adopting it means
+  changing markup. This site uses none of `.entries`/`.entry`, so the cheapest
+  path is deleting that dead block when the blog adopts `editorial.css`.
+- `texture.css` `.tex-grain` covers the hand-rolled `body::before` grain.
+- `.eyebrow` (0.27.0) covers small uppercase labels. None exist here today.
+
 ## 2026-08-02 — Three-zone colophon spine (0.22.0)
 
 **Fleet consistency pass.** `@cameronsjo/artificer@0.22.0` minted
