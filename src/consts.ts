@@ -59,6 +59,12 @@ export const PROJECTS: Project[] = [
     href: '/understanding-claude-code',
   },
   {
+    title: 'Agentic 101',
+    blurb:
+      'How AI actually works, one block at a time — two free, no-math, interactive courses.',
+    href: '/agentic-101',
+  },
+  {
     // A separate project Pages site (cameronsjo/artificer) mounted at
     // /artificer/ — it owns this path and shadows any in-site route here.
     // No trailing slash, like every other href: slug() renders the href as
