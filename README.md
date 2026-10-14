@@ -33,6 +33,10 @@ add an entry there to list a new site. Each `href` is an **absolute root path**
 to a separate deployment (`/blog`), hardcoded rather than routed through
 `withBase()`, because those sites are independent of this one.
 
+The launcher is a filter over ordinary links, with a live destination count.
+Tab visits matching links; optional arrow shortcuts move actual link focus.
+Every destination remains usable without JavaScript.
+
 ## Structure
 
 | Path | Purpose |
