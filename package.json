@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "check:launcher": "npm run build && node scripts/check-launcher.cjs",
     "astro": "astro"
   },
   "engines": {
@@ -23,6 +24,8 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@tailwindcss/vite": "^4.3.3",
+    "axe-core": "^4.14.0",
+    "playwright": "^1.64.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
   }

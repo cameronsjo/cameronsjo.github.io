@@ -25,7 +25,6 @@ const slug = (href: string) => href.replace(/^\//, '');
         autocomplete="off"
         spellcheck="false"
         aria-label="Filter destinations"
-        aria-controls="launcher-list"
       />
       <kbd class="launcher__kbd" data-launcher-hint>/</kbd>
     </div>
@@ -101,6 +100,7 @@ const slug = (href: string) => href.replace(/^\//, '');
       return Array.from(list!.querySelectorAll<HTMLAnchorElement>('li:not([hidden]) > .row'));
     }
 
+    let announceTimer: ReturnType<typeof setTimeout>;
     function render() {
       const q = input!.value.trim().toLowerCase();
       const ranked = items
@@ -113,7 +113,11 @@ const slug = (href: string) => href.replace(/^\//, '');
         list!.appendChild(it.li); // reorder by score
       });
       if (empty) empty.hidden = ranked.length > 0;
-      if (status) status.textContent = `${ranked.length} ${ranked.length === 1 ? 'destination' : 'destinations'}`;
+      clearTimeout(announceTimer);
+      const countMessage = `${ranked.length} ${ranked.length === 1 ? 'destination' : 'destinations'}`;
+      if (status && status.textContent !== countMessage) {
+        announceTimer = setTimeout(() => { status.textContent = countMessage; }, 300);
+      }
     }
 
     input.addEventListener('input', render);
@@ -356,8 +360,7 @@ const slug = (href: string) => href.replace(/^\//, '');
       opacity: 1;
     }
     .row:hover .row__go,
-    .row:focus-visible .row__go,
-    .row.is-active .row__go {
+    .row:focus-visible .row__go {
       transform: none;
     }
   }

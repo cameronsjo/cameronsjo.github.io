@@ -13,7 +13,16 @@ npm run dev      # http://localhost:4321/
 npm run build    # static output to dist/
 npm run preview  # serve the built site
 npm run check    # type-check components
+npm run check:launcher # build, preview, keyboard/no-JS + axe checks, stop preview
 ```
+
+The launcher check declares Playwright and axe as dev dependencies; no
+`NODE_PATH` or manually started preview is needed. Install the browser once
+with `npx playwright install chromium`, or reuse installed Chrome with
+`PLAYWRIGHT_CHROMIUM_CHANNEL=chrome npm run check:launcher`. It checks both
+1280px and 390px, including whole-page axe scans in dark and light modes.
+`PREVIEW_URL` optionally targets an existing production preview. Manual
+VoiceOver on Safari acceptance is still owed by the repo owner for issue #21.
 
 > **Don't remove the `vite` override in `package.json`.** It pins Vite to
 > `7.3.3`. Without it a fresh install / `npm update` pulls Vite 8, which

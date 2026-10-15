@@ -1,11 +1,14 @@
-// Run against npm run preview with Playwright available via NODE_PATH.
+// npm run check:launcher builds first; this script owns its preview lifecycle.
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 
 (async () => {
-  const browser = await chromium.launch({ headless: true, channel: 'chrome' });
-  const url = process.env.PREVIEW_URL || 'http://127.0.0.1:4121/';
+  const { preview } = await import('astro');
+  const server = process.env.PREVIEW_URL ? null : await preview({ server: { host: '127.0.0.1', port: 0, open: false } });
+  const url = process.env.PREVIEW_URL || `http://127.0.0.1:${server.port}/`;
+  let browser;
   try {
+    browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_CHROMIUM_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHROMIUM_CHANNEL } : {}) });
     for (const width of [1280, 390]) {
       const page = await browser.newPage({ viewport: { width, height: 900 } });
       await page.route('https://**', route => route.abort());
@@ -18,16 +21,21 @@ const assert = require('node:assert/strict');
       assert.equal(await page.locator('[role="combobox"], [role="listbox"], [role="option"], [aria-activedescendant], [aria-selected]').count(), 0);
       const total = await list.getByRole('link').count();
       assert(total > 0);
-      await input.fill('blog notes');
+      const firstLink = list.getByRole('link').first();
+      const expectedHref = await firstLink.getAttribute('href');
+      const query = await firstLink.getAttribute('data-search');
+      assert(query && expectedHref, 'A destination must provide search text and a URL');
+      const searchLengths = await list.getByRole('link').evaluateAll(nodes => nodes.map(el => (el.dataset.search || '').length));
+      await input.fill(query);
       await page.waitForFunction(() => document.getElementById('launcher-status').textContent === '1 destination');
       assert.equal(await list.getByRole('link').count(), 1);
       await input.press('Tab');
-      assert.equal(await page.evaluate(() => document.activeElement.getAttribute('href')), '/blog');
+      assert.equal(await page.evaluate(() => document.activeElement.getAttribute('href')), expectedHref);
       await page.keyboard.press('Escape');
       assert(await input.evaluate(el => document.activeElement === el));
-      await input.fill('zzzzzzzzzz');
+      await input.fill('x'.repeat(Math.max(...searchLengths) + 1));
       assert.equal(await list.getByRole('link').count(), 0);
-      assert.equal(await page.getByRole('status').textContent(), '0 destinations');
+      await page.waitForFunction(() => document.getElementById('launcher-status').textContent === '0 destinations');
       await input.press('Escape');
       assert.equal(await list.getByRole('link').count(), total);
       await input.press('ArrowDown');
@@ -40,6 +48,28 @@ const assert = require('node:assert/strict');
       await page.keyboard.press('ArrowUp');
       assert(await input.evaluate(el => document.activeElement === el));
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
+      for (const theme of ['dark', 'light']) {
+        await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
+        // A theme toggle transitions text and backgrounds separately. Scan the
+        // settled theme, not an intermediate light-text/dark-background frame.
+        await page.evaluate(async () => {
+          await document.fonts.ready;
+          for (let pass = 0; pass < 10; pass++) {
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            const animations = document.getAnimations().filter(animation =>
+              animation.playState === 'running' && Number.isFinite(animation.effect?.getComputedTiming().endTime));
+            if (!animations.length) return;
+            await Promise.all(animations.map(animation => animation.finished.catch(error => {
+              if (error.name !== 'AbortError') throw error; // Replaced transitions are inspected on the next pass.
+            })));
+          }
+          throw new Error('Theme animations did not settle before the axe scan');
+        });
+        const result = await page.evaluate(() => axe.run());
+        console.log({ width, theme, axeViolations: result.violations.map(({ id }) => id) });
+        assert.equal(result.violations.length, 0, JSON.stringify(result.violations));
+      }
       console.log({ width, total, keyboardFocus: true, emptyState: true, overflow: false });
       await page.close();
     }
@@ -51,5 +81,7 @@ const assert = require('node:assert/strict');
     assert(hrefs.length > 0 && hrefs.every(Boolean));
     console.log({ noJavaScriptLinks: hrefs.length });
     await context.close();
-  } finally { await browser.close(); }
+  } finally {
+    try { await browser?.close(); } finally { await server?.stop(); }
+  }
 })().catch(e => { console.error(e); process.exitCode = 1; });
