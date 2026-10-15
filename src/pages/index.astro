@@ -25,16 +25,13 @@ const slug = (href: string) => href.replace(/^\//, '');
         autocomplete="off"
         spellcheck="false"
         aria-label="Filter destinations"
-        role="combobox"
-        aria-controls="launcher-list"
-        aria-autocomplete="list"
       />
       <kbd class="launcher__kbd" data-launcher-hint>/</kbd>
     </div>
-    <ul id="launcher-list" class="launcher__list" role="listbox" aria-label="Destinations">
+    <ul id="launcher-list" class="launcher__list" role="list" aria-label="Destinations">
       {
         PROJECTS.map((p, i) => (
-          <li id={`opt-${i}`} role="option" aria-selected="false">
+          <li>
             <a
               class="row"
               href={p.href}
@@ -51,8 +48,8 @@ const slug = (href: string) => href.replace(/^\//, '');
         ))
       }
     </ul>
-    {/* Outside the listbox: a listbox may only own options. */}
-    <p class="launcher__empty" role="status" hidden>
+    <p id="launcher-status" class="sr-only" role="status">{PROJECTS.length} destinations</p>
+    <p class="launcher__empty" hidden>
       No destination matches. Try <b>blog</b>, <b>agentic</b>, or <b>today</b>.
     </p>
   </section>
@@ -65,19 +62,19 @@ const slug = (href: string) => href.replace(/^\//, '');
 </BaseLayout>
 
 <script>
-  // Fuzzy command palette. Enhancement only — the <a> links work without this.
+  // Fuzzy filtering over ordinary links. The links also work without this.
   const input = document.getElementById('launcher-input') as HTMLInputElement | null;
   const list = document.getElementById('launcher-list');
   if (input && list) {
     const rows = Array.from(list.querySelectorAll<HTMLAnchorElement>('.row'));
     const empty = document.querySelector<HTMLElement>('.launcher__empty');
+    const status = document.getElementById('launcher-status');
     const hint = document.querySelector<HTMLElement>('[data-launcher-hint]');
     const items = rows.map((a) => ({
       a,
       li: a.closest('li') as HTMLElement,
       text: a.dataset.search || a.textContent || '',
     }));
-    let active = 0;
 
     // Subsequence fuzzy score: -1 if not all query chars appear in order;
     // higher score rewards consecutive runs and word-boundary starts.
@@ -100,26 +97,10 @@ const slug = (href: string) => href.replace(/^\//, '');
     }
 
     function visible(): HTMLAnchorElement[] {
-      return items.filter((it) => !it.li.hidden).map((it) => it.a);
+      return Array.from(list!.querySelectorAll<HTMLAnchorElement>('li:not([hidden]) > .row'));
     }
 
-    function paintActive(vis: HTMLAnchorElement[]) {
-      // ARIA selection lives on the <li role="option">; the .is-active class
-      // (visual highlight) lives on the inner <a class="row">.
-      rows.forEach((a) => a.classList.remove('is-active'));
-      items.forEach((it) => it.li.setAttribute('aria-selected', 'false'));
-      const el = vis[active];
-      if (el) {
-        const li = el.closest('li') as HTMLElement;
-        el.classList.add('is-active');
-        li.setAttribute('aria-selected', 'true');
-        input!.setAttribute('aria-activedescendant', li.id);
-        el.scrollIntoView({ block: 'nearest' });
-      } else {
-        input!.removeAttribute('aria-activedescendant');
-      }
-    }
-
+    let announceTimer: ReturnType<typeof setTimeout>;
     function render() {
       const q = input!.value.trim().toLowerCase();
       const ranked = items
@@ -132,26 +113,23 @@ const slug = (href: string) => href.replace(/^\//, '');
         list!.appendChild(it.li); // reorder by score
       });
       if (empty) empty.hidden = ranked.length > 0;
-      active = ranked.length ? 0 : -1;
-      paintActive(visible());
+      clearTimeout(announceTimer);
+      const countMessage = `${ranked.length} ${ranked.length === 1 ? 'destination' : 'destinations'}`;
+      if (status && status.textContent !== countMessage) {
+        announceTimer = setTimeout(() => { status.textContent = countMessage; }, 300);
+      }
     }
 
     input.addEventListener('input', render);
 
     input.addEventListener('keydown', (e) => {
       const vis = visible();
-      if (e.key === 'ArrowDown') {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
-        active = Math.min(active + 1, vis.length - 1);
-        if (active < 0) active = 0;
-        paintActive(vis);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        active = Math.max(active - 1, 0);
-        paintActive(vis);
+        (e.key === 'ArrowDown' ? vis[0] : vis.at(-1))?.focus();
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        if (vis[active]) vis[active].click();
+        vis[0]?.click();
       } else if (e.key === 'Escape') {
         if (input!.value) {
           input!.value = '';
@@ -162,16 +140,21 @@ const slug = (href: string) => href.replace(/^\//, '');
       }
     });
 
-    // Sync keyboard selection to mouse hover so the two don't fight.
-    rows.forEach((a) => {
-      a.addEventListener('mousemove', () => {
-        const vis = visible();
-        const idx = vis.indexOf(a);
-        if (idx !== -1 && idx !== active) {
-          active = idx;
-          paintActive(vis);
-        }
-      });
+    // Optional arrow shortcuts move real link focus; Tab and Enter stay native.
+    list.addEventListener('keydown', (e) => {
+      const vis = visible();
+      const index = vis.indexOf(document.activeElement as HTMLAnchorElement);
+      if (index < 0 || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        vis[Math.min(index + 1, vis.length - 1)]?.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (index === 0) input!.focus();
+        else vis[index - 1]?.focus();
+      } else if (e.key === 'Escape') {
+        input!.focus();
+      }
     });
 
     // ⌘K / Ctrl+K opens (focuses) the palette; "/" focuses when not typing.
@@ -193,8 +176,7 @@ const slug = (href: string) => href.replace(/^\//, '');
     });
 
     if (hint) hint.textContent = '⌘K';
-    input.setAttribute('aria-expanded', 'true'); // set by JS so no-JS paths don't claim an open popup
-    paintActive(visible());
+    render();
   }
 </script>
 
@@ -298,7 +280,7 @@ const slug = (href: string) => href.replace(/^\//, '');
     transition: background var(--dur-fast) var(--ease);
   }
   .row:hover,
-  .row.is-active {
+  .row:focus-visible {
     background: var(--bg-raised);
     text-decoration: none;
   }
@@ -319,7 +301,7 @@ const slug = (href: string) => href.replace(/^\//, '');
     transition: color var(--dur-fast) var(--ease);
   }
   .row:hover .row__name,
-  .row.is-active .row__name {
+  .row:focus-visible .row__name {
     color: var(--accent);
   }
   /* The blurb is prose, so it takes the sans body face. */
@@ -338,8 +320,7 @@ const slug = (href: string) => href.replace(/^\//, '');
       transform var(--dur-fast) var(--ease);
   }
   .row:hover .row__go,
-  .row:focus-visible .row__go,
-  .row.is-active .row__go {
+  .row:focus-visible .row__go {
     opacity: 1;
     color: var(--accent);
     transform: translateX(3px);
@@ -379,8 +360,7 @@ const slug = (href: string) => href.replace(/^\//, '');
       opacity: 1;
     }
     .row:hover .row__go,
-    .row:focus-visible .row__go,
-    .row.is-active .row__go {
+    .row:focus-visible .row__go {
       transform: none;
     }
   }
