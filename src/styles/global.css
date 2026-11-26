@@ -1,14 +1,7 @@
 @import "tailwindcss";
+@import "@cameronsjo/artificer/tailwind.css";
 
-/* Fonts (Bricolage Grotesque + Recursive + JetBrains Mono) are provided by
-   @cameronsjo/artificer's bundled @font-face — Vite resolves and emits the
-   hashed woff2 from node_modules under the site's base path. */
-
-/* Expose the font stacks as Tailwind theme vars (font-sans / font-mono). */
-@theme {
-  --font-sans: "Bricolage Grotesque", "Source Sans 3", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "Berkeley Mono", ui-monospace, "SF Mono", Menlo, monospace;
-}
+/* Fonts and Tailwind v4 @theme vars are provided by @cameronsjo/artificer. */
 
 /* ── Site-specific base ──────────────────────────────────────────────────
    @cameronsjo/artificer (artificer.css) owns the full semantic palette, the
